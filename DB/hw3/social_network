@@ -1,0 +1,13 @@
+1:
+select name from Highschooler
+where ID in
+(select ID2 from Friend join Highschooler
+where ID1 = ID and name = 'Gabriel');
+
+2:
+select H1.name, H1.grade, H2.name, H2.grade
+from Likes join Highschooler H1 join Highschooler H2
+where ID1 = H1.ID and ID2 = H2.ID and H1.grade - H2.grade > 1;
+
+3:
+

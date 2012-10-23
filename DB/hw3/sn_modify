@@ -1,0 +1,11 @@
+1:
+delete from Highschooler where grade=12
+
+2: broken
+delete from likes
+where id1 in (select distinct l1.id1 from likes l1, likes l2, friend where l1.id1=l2.id2 and not l1.id2=l2.id1 and
+(l1.id1=l2.id2 or l1.id2=l2.id1))
+and
+id2 in (select distinct l1.id2 from likes l1, likes l2, friend
+where l1.id1=l2.id2 and not l1.id2=l2.id1 and
+(l1.id1=l2.id2 or l1.id2=l2.id1))

@@ -1,0 +1,88 @@
+1:
+\project_{pizza}
+\select_{gender='female' and age > 20}
+(Person \join  Eats)
+
+2:
+\project_{name}
+\select_{gender='female' and pizzeria='Straw Hat'}
+(Person \join Serves \join Eats)
+
+
+3:
+\project_{pizzeria}
+\select_{name="Amy" and price < 10}
+(Person \join Serves \join Eats)
+
+
+4:
+(\project_{pizzeria}
+\select_{name="Fay" and price < 10}
+(Person \join Serves \join Eats))
+\intersect
+(\project_{pizzeria}
+\select_{name="Fay" and price < 10}
+(Person \join Serves \join Eats))
+
+
+5:
+(\project_{name}
+\select_{pizzeria='Dominos'}
+(Person \join Eats \join Serves))
+\diff
+(\project_{name}
+\select_{pizzeria='Dominos'} Frequents)
+
+
+6:
+(\project_{pizza}
+\select_{price<10} Serves
+\diff
+\project_{pizza}
+\select_{price>=10} Serves)
+\union
+(\project_{pizza}
+\select_{age<24} (Eats \join Person)
+\diff
+\project_{pizza}
+\select_{age>=24} (Eats \join Person))
+
+7:
+\rename_{age}
+\project_{age1}
+(\rename_{age1}
+\project_{age}
+\select_{pizza='mushroom'}
+(Person \join  Eats)
+\join_{age1>age2}
+\rename_{age2}
+\project_{age}
+\select_{pizza='mushroom'}
+(Person \join  Eats))
+\diff
+\rename_{age}
+\project_{age2}
+(\rename_{age1}
+\project_{age}
+\select_{pizza='mushroom'}
+(Person \join  Eats)
+\join_{age1>age2}
+\rename_{age2}
+\project_{age}
+\select_{pizza='mushroom'}
+(Person \join  Eats))
+
+8:
+\project_{pizzeria}
+Serves
+\diff
+\project_{pizzeria}
+(Serves \join
+((\project_{pizza}
+Serves)
+\diff
+(\project_{pizza}
+\select_{age>30} (Person \join Eats))))
+
+9:
+(\project_{pizzeria} Serves) \diff \project_{pizzeria} (((\project_{pizzeria} Serves) \cross \project_{pizza}\select_{age>30} (Person \join Eats)) \diff \project_{pizzeria,pizza} Serves)

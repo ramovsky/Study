@@ -1,0 +1,22 @@
+1:
+insert into reviewer values(209, 'Roger Ebert')
+
+2:
+insert into Rating
+select rID, mID, 5, null
+from Reviewer, Movie
+where name = 'James Cameron';
+
+3:
+update Movie
+set year = year + 25
+where mID in
+(select mID from Movie join Rating using(mID)
+group by mID
+having avg(stars) >= 4);
+
+4:
+delete from Rating
+where mID in
+(select mID from Movie join Rating using(mID)
+where (year < 1970 or year > 2000)) and stars < 4;

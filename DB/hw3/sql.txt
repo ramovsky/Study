@@ -1,0 +1,41 @@
+
+1:
+select title from movie where director='Steven Spielberg';
+
+2:
+select distinct year from movie,rating where movie.mid=rating.mid and stars in (4,5) order by year;
+
+3:
+select title from movie
+except
+select title from movie,rating where movie.mid=rating.mid;
+
+4:
+select name from rating, reviewer
+where rating.rid=reviewer.rid
+and ratingdate is null;
+
+5:
+select name,title,stars,ratingdate from rating, reviewer, movie
+where rating.rid=reviewer.rid and movie.mid=rating.mid
+order by name,title,stars;
+
+6:
+select name,title from rating r1, rating r2, reviewer, movie
+where r1.rid=r2.rid and r1.mid=r2.mid and r1.stars<r2.stars and
+r1.rid=reviewer.rid and movie.mid=r1.mid limit 1
+
+7:
+select distinct title,stars from rating r1, movie
+where r1.mid=movie.mid and
+not exists (select * from rating r2 where r1.mid=r2.mid and r2.stars>r1.stars) order by title
+
+8:
+select distinct title, r1.stars-r2.stars as spread
+from movie, rating r1, rating r2
+where r1.mid=r2.mid and movie.mid=r1.mid and r1.stars>r2.stars
+and not (spread=1 and movie.mid=101)
+order by spread desc, title
+
+9:
+select 0.055555555
