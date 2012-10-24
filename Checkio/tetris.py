@@ -65,11 +65,10 @@ class Figure:
                 if self.data[i][j]:
                     break
                 self.top[j] -= 1
-            for i in range(h, 0, 1):
+            for i in range(h, 0, -1):
                 if self.data[i-1][j]:
                     break
                 self.bottom[j] -= 1
-        print(self.top, self.bottom)
 
     def rotate(self):
         rotated = []
@@ -85,38 +84,33 @@ class Figure:
 
 class Field:
 
-    def __init__(self, width=10, height=12):
+    def __init__(self, width=10, height=12, deadline=0):
         self.data = []
         self.width = width
         self.height = height
+        self.deadline = deadline
         for i in range(height):
             self.data.append([0]*width)
+        self.top = [0]*width
 
     def fit(self, figure, position=0):
         field = deepcopy(self.data)
-        for field_row in range(self.height, 0, -1):
-            for j, fig_row in enumerate(reversed(figure)):
-                over = False
-                for i, a in enumerate(fig_row):
-                    if a and field[field_row-j-1][position+i]:
-                        over = True
-                        break
-                if over:
-                    break
-            else:
-                for j, fig_row in enumerate(reversed(figure)):
-                    for i, a in enumerate(fig_row):
-                        field[field_row-j-1][position+i] += a
-                break
-        self.check(field)
+        top = self.top[:]
+        old_top = self.top[position: position+figure.width]
+        dive = max(map(sum, zip(old_top, figure.bottom)))
+        field_row = self.height - dive
+        for j, fig_row in enumerate(reversed(figure.data)):
+            for i, a in enumerate(fig_row):
+                field[field_row-j-1][position+i] += a
         return field
 
     def put(self, figure, position=0):
         self.data = self.fit(figure, position)
+        clear, self.top = self.check(self.data)
         return self.data
 
     def check(self, data):
-        if sum(data[0]) > 0:
+        if sum(data[self.deadline]) > 0:
             raise GameOver()
         clear = []
         for i, row in enumerate(data):
@@ -125,7 +119,13 @@ class Field:
         for c in clear:
             data.pop(c)
             data.insert(0, [0]*self.width)
-        return len(clear)
+        top = [self.height] * self.width
+        for j in range(self.width):
+            for i in range(self.height):
+                if data[i][j]:
+                    break
+                top[j] -= 1
+        return len(clear), top
 
 
 class Game:
@@ -137,31 +137,33 @@ class Game:
         score = 0
         while True:
             score += 1
-            figure = choice(FIGURES)
+            figure = Figure(choice(FIGURES))
             for i in range(randrange(0, 4)):
-                figure = rotate(figure)
-            pprint(figure)
-            self.field.put(figure, randrange(0, self.field.width - len(figure[0]) + 1))
+                figure.rotate()
+            pprint(figure.data)
+            self.field.put(figure, randrange(0, self.field.width - figure.width) + 1)
             pprint(self.field.data)
+
+
+def holes(matrix):
+    w = len(matrix[0])
+    h = len(matrix)
+    count = 0
+    for i in range(w):
+        found = False
+        for j in range(h):
+            if found and not matrix[j][i]:
+                count += 1
+            if matrix[j][i]:
+                found = True
+    return count
 
 
 def pprint(matrix, time=0.5):
     sleep(time)
-    for i in range(len(matrix)):
-        print(matrix[i])
-    print('\n')
+    for row in matrix:
+        print(''.join(map(str, row)))
     stdout.flush()
-
-
-def rotate(figure):
-    assert figure, 'Empty figure'
-    rotated = []
-    for i in range(len(figure[0])):
-        r = []
-        for j in range(len(figure), 0, -1):
-            r.append(figure[j-1][i])
-        rotated.append(r)
-    return rotated
 
 
 def main():
@@ -169,13 +171,29 @@ def main():
 
 
 def test():
-    for f in FIGURES[2:]:
-        pprint(f)
-        f = Figure(f)
-        f.rotate()
-        pprint(f.data)
-#    g = Game()
-#    g.run()
+    field = Field()
+    while 1:
+        cmd, *args = input("\nEnter command: ").split(' ')
+        if cmd == 'new':
+            field = Field()
+            print('done')
+        elif cmd == 'next':
+            figure = Figure(choice(FIGURES))
+            pprint(figure.data)
+        elif cmd == 'rot':
+            figure.rotate()
+            pprint(figure.data)
+        elif cmd == 'put':
+            field.put(figure, int(args[0]))
+            pprint(field.data)
+        elif cmd == 'fit':
+            fld = field.fit(figure, int(args[0]))
+            print(holes(fld), field.check(fld))
+        elif cmd == 'top':
+            pprint(field.data)
+            print('top', field.top)
+        elif cmd == 'exit':
+            break
 
 
 if __name__ == '__main__':
