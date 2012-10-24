@@ -159,11 +159,24 @@ def holes(matrix):
     return count
 
 
-def pprint(matrix, time=0.5):
+def pprint(matrix, time=0):
     sleep(time)
     for row in matrix:
         print(''.join(map(str, row)))
     stdout.flush()
+
+
+def penalty(field, figure, position):
+    a = 1
+    b = 3
+    c = 10
+    d = 0.5
+    try:
+        fld = field.fit(figure, position)
+        clr, top = field.check(fld)
+    except GameOver:
+        return 100000
+    return a*holes(fld) + b*max(top) + d*sum(top) - c*clr
 
 
 def main():
@@ -174,6 +187,8 @@ def test():
     field = Field()
     while 1:
         cmd, *args = input("\nEnter command: ").split(' ')
+        if not cmd:
+            cmd = 'move'
         if cmd == 'new':
             field = Field()
             print('done')
@@ -192,6 +207,21 @@ def test():
         elif cmd == 'top':
             pprint(field.data)
             print('top', field.top)
+        elif cmd == 'move':
+            figure = Figure(choice(FIGURES))
+            pprint(figure.data)
+            m = (10000, 0, 0)
+            for i in range(4):
+                for j in range(field.width - figure.width + 1):
+                    p = penalty(field, figure, j)
+                    if p < m[0]:
+                        m = (p, i, j)
+                figure.rotate()
+            for i in range(m[1]):
+                figure.rotate()
+            print(m)
+            field.put(figure, m[2])
+            pprint(field.data)
         elif cmd == 'exit':
             break
 
