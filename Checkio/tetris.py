@@ -47,6 +47,42 @@ class GameOver(Exception):
     '''Game over'''
 
 
+class Figure:
+
+    def __init__(self, matrix):
+        self.data = matrix
+        self.updte_profile()
+        self.width = len(matrix[0])
+        self.height = len(matrix)
+
+    def updte_profile(self):
+        self.width = w = len(self.data[0])
+        self.height = h = len(self.data)
+        self.top = [h] * w
+        self.bottom = [0] * w
+        for j in range(w):
+            for i in range(h):
+                if self.data[i][j]:
+                    break
+                self.top[j] -= 1
+            for i in range(h, 0, 1):
+                if self.data[i-1][j]:
+                    break
+                self.bottom[j] -= 1
+        print(self.top, self.bottom)
+
+    def rotate(self):
+        rotated = []
+        for i in range(self.width):
+            r = []
+            for j in range(self.height, 0, -1):
+                r.append(self.data[j-1][i])
+            rotated.append(r)
+        self.data = rotated
+        self.updte_profile()
+        return rotated
+
+
 class Field:
 
     def __init__(self, width=10, height=12):
@@ -133,8 +169,13 @@ def main():
 
 
 def test():
-    g = Game()
-    g.run()
+    for f in FIGURES[2:]:
+        pprint(f)
+        f = Figure(f)
+        f.rotate()
+        pprint(f.data)
+#    g = Game()
+#    g.run()
 
 
 if __name__ == '__main__':
