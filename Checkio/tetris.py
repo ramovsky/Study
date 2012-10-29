@@ -42,6 +42,8 @@ FIGURES = (
             ),
         )
 
+GAMEOVER = 100000
+
 
 class GameOver(Exception):
     '''Game over'''
@@ -81,6 +83,9 @@ class Figure:
         self.updte_profile()
         return rotated
 
+    def __eq__(self, other):
+        return self.data == other.data
+
 
 class Field:
 
@@ -93,39 +98,91 @@ class Field:
             self.data.append([0]*width)
         self.top = [0]*width
 
-    def fit(self, figure, position=0):
-        field = deepcopy(self.data)
-        top = self.top[:]
-        old_top = self.top[position: position+figure.width]
-        dive = max(map(sum, zip(old_top, figure.bottom)))
+    def put(self, figure, position=0):
+
+        top_slice = self.top[position: position+figure.width]
+        dive = max(map(sum, zip(top_slice, figure.bottom)))
         field_row = self.height - dive
         for j, fig_row in enumerate(reversed(figure.data)):
             for i, a in enumerate(fig_row):
-                field[field_row-j-1][position+i] += a
-        return field
+                self.data[field_row-j-1][position+i] += a
 
-    def put(self, figure, position=0):
-        self.data = self.fit(figure, position)
-        clear, self.top = self.check(self.data)
-        return self.data
-
-    def check(self, data):
-        if sum(data[self.deadline]) > 0:
+        if sum(self.data[self.deadline]) > 0:
             raise GameOver()
+            return GAMEOVER
+
         clear = []
-        for i, row in enumerate(data):
+        for i, row in enumerate(self.data):
             if sum(row) == self.width:
                 clear.append(i)
         for c in clear:
-            data.pop(c)
-            data.insert(0, [0]*self.width)
-        top = [self.height] * self.width
+            self.data.pop(c)
+            self.data.insert(0, [0]*self.width)
+        self.top = [self.height] * self.width
         for j in range(self.width):
             for i in range(self.height):
-                if data[i][j]:
+                if self.data[i][j]:
                     break
-                top[j] -= 1
-        return len(clear), top
+                self.top[j] -= 1
+
+        a = 1
+        b = 3
+        c = 10
+        d = 0.5
+        return a*holes(self.data) + b*max(self.top) + d*sum(self.top) - c*len(clear)
+
+
+class Node:
+    '''Decision tree node'''
+
+    def __init__(self, field):
+        self.field = field
+        self.children = {}
+
+    def update(self, figure, position):
+        self.field.put(figure, position)
+
+    def expand(self, stack=None):
+        if stack:
+            figures = [stack[0]]
+        else:
+            figures = [FIGURES[0]]
+        check = []
+        work = {}
+        for f in figures:
+            check.append(f)
+            work[0] = f
+            for i in range(1, 4):
+                f = rotate(f)
+                if f not in check:
+                    check.append(f)
+                    work[i] = f
+        for r, f in work.items():
+            figure = Figure(f)
+            for i in range(self.field.width - figure.width + 1):
+                node = Node(deepcopy(self.field))
+                try:
+                    node.update(figure, i)
+                except GameOver:
+                    continue
+
+                self.children[(r, i)] = node
+                if stack:
+                    node.expand(stack[1:])
+                elif stack == []:
+                    node.expand()
+
+
+class Tree:
+    '''Decision tree'''
+
+    def __init__(self, stack):
+        self.best_move = None
+        self.root = Node(Field())
+        self.root.expand(stack)
+
+    def move(self, next):
+        self.root = self.root.children[next]
 
 
 class Game:
@@ -159,6 +216,18 @@ def holes(matrix):
     return count
 
 
+def rotate(data):
+    rotated = []
+    w = len(data[0])
+    h = len(data)
+    for i in range(w):
+        r = []
+        for j in range(h, 0, -1):
+            r.append(data[j-1][i])
+        rotated.append(r)
+    return rotated
+
+
 def pprint(matrix, time=0):
     sleep(time)
     for row in matrix:
@@ -166,22 +235,16 @@ def pprint(matrix, time=0):
     stdout.flush()
 
 
-def penalty(field, figure, position):
-    a = 1
-    b = 3
-    c = 10
-    d = 0.5
-    try:
-        fld = field.fit(figure, position)
-        clr, top = field.check(fld)
-    except GameOver:
-        return 100000
-    return a*holes(fld) + b*max(top) + d*sum(top) - c*clr
-
-
 def main():
-    return
+    tree = Tree([choice(FIGURES) for i in range(1)])
+    print_tree(tree.root)
 
+def print_tree(node, i=0):
+    print(i)
+    for k, v in node.children.items():
+        if v.children:
+            print(v.children.keys())
+            print_tree(v, i+1)
 
 def test():
     field = Field()
@@ -227,4 +290,4 @@ def test():
 
 
 if __name__ == '__main__':
-    test()
+    main()
