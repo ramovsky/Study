@@ -146,7 +146,7 @@ class Node:
         if stack:
             figures = [stack[0]]
         else:
-            figures = [FIGURES[0]]
+            figures = FIGURES
         check = []
         work = {}
         for f in figures:
@@ -169,8 +169,6 @@ class Node:
                 self.children[(r, i)] = node
                 if stack:
                     node.expand(stack[1:])
-                elif stack == []:
-                    node.expand()
 
 
 class Tree:
