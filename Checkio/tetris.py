@@ -125,11 +125,11 @@ class Field:
                     break
                 self.top[j] -= 1
 
-        a = 1
-        b = 3
+        a = 3
+        b = 0.5
         c = 10
-        d = 0.5
-        return a*holes(self.data) + b*max(self.top) + d*sum(self.top) - c*len(clear)
+        d = 0.05
+        return 100 + a*holes(self.data) + b*max(self.top) + d*sum(self.top) - c*(len(clear)+1)**2
 
 cuted = 0
 puted = 0
@@ -175,7 +175,7 @@ class Node:
         global cuted, puted
         if stack:
             for child in self.children.values():
-                if child.penalty < 1.4*min_penalty:
+                if child.penalty < 1.1*min_penalty:
                     node.expand(stack[1:])
                     puted += 1
                 else:
@@ -245,10 +245,6 @@ def pprint(matrix, time=0):
     stdout.flush()
 
 
-def main():
-    tree = Tree([choice(FIGURES) for i in range(1)])
-    print_tree(tree.root)
-
 def print_tree(node, i=0):
     print(i)
     for k, v in node.children.items():
@@ -297,6 +293,10 @@ def test():
             pprint(field.data)
         elif cmd == 'exit':
             break
+
+
+def main():
+    field = Field()
 
 
 if __name__ == '__main__':
