@@ -5,15 +5,15 @@ def get_xy(diagonal, element):
     diff = on_diag - element
     sector, shift = diff // edge, diff % edge
     if sector < 2:
-        x -= shift
+        y -= sector*edge + shift
     elif sector < 4:
-        x -= 2*edge
-        y -= shift
-    elif sector < 6:
-        x -= 2*edge - shift
         y -= 2*edge
+        x -= (sector-2)*edge + shift
+    elif sector < 6:
+        y -= 2*edge - shift - (sector-4)*edge
+        x -= 2*edge
     else:
-        y -= 2*edge - shift
+        x -= 2*edge - shift - (sector-6)*edge
     return x, y
 
 def checkio(data):
@@ -27,9 +27,12 @@ def checkio(data):
     x_a, y_a = get_xy(diagonal, a)
     x_b, y_b = get_xy(diagonal, b)
     print(x_a, y_a, x_b, y_b)
-    return 10
+    return abs(x_a - x_b) + abs(y_a - y_b)
 
 if __name__ == '__main__':
+    diagonal = [i**2 for i in range(1, 100, 2)]
+    for i in range(2, 20):
+        print(get_xy(diagonal, i))
 #    assert checkio([1, 9]) == 2, "First"
 #    assert checkio([9, 1]) == 2, "Reverse First"
 #    assert checkio([10, 25]) == 1, "Neighbours"
