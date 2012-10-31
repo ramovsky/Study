@@ -131,8 +131,7 @@ class Field:
         d = 0.05
         return 100 + a*holes(self.data) + b*max(self.top) + d*sum(self.top) - c*(len(clear)+1)**2
 
-cuted = 0
-puted = 0
+best = []
 
 class Node:
     '''Decision tree node'''
@@ -161,25 +160,21 @@ class Node:
                 if f not in check:
                     check.append(f)
                     work[i] = f
-        min_penalty = GAMEOVER
+        nodes = []
         for r, f in work.items():
             figure = Figure(f)
             for i in range(self.field.width - figure.width + 1):
                 node = Node(deepcopy(self.field))
                 try:
-                    min_penalty = min(min_penalty, node.update(figure, i))
+                    nodes.append((r, i, node, node.update(figure, i)))
                 except GameOver:
                     continue
-
-                self.children[(r, i)] = node
-        global cuted, puted
+        global best
         if stack:
-            for child in self.children.values():
-                if child.penalty < 1.1*min_penalty:
-                    node.expand(stack[1:])
-                    puted += 1
-                else:
-                    cuted += 1
+            for r, pos, node, score in sorted(nodes, key=lambda a: -a[-1])[-3:]:
+                self.children[(r, pos)] = node
+                node.expand(stack[1:])
+                best.append(node)
 
 
 class Tree:
@@ -189,7 +184,6 @@ class Tree:
         self.best_move = None
         self.root = Node(Field())
         self.root.expand(stack)
-        print(puted, cuted)
 
     def move(self, next):
         self.root = self.root.children[next]
