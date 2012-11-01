@@ -31,6 +31,9 @@ def checkio(data):
     return abs(x_a - x_b) + abs(y_a - y_b)
 
 if __name__ == '__main__':
+    diagonal = [i**2 for i in range(1,20)]
+    for i in range(1, 100):
+        print('{}\t{}'.format(i, get_xy(diagonal, i)))
     assert checkio([1, 9]) == 2, "First"
     assert checkio([9, 1]) == 2, "Reverse First"
     assert checkio([10, 25]) == 1, "Neighbours"
