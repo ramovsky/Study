@@ -131,21 +131,24 @@ class Field:
         d = 0.05
         return 100 + a*holes(self.data) + b*max(self.top) + d*sum(self.top) - c*(len(clear)+1)**2
 
-best = []
+best = (None, GAMEOVER)
 
 class Node:
     '''Decision tree node'''
 
-    def __init__(self, field):
+    def __init__(self, field, parent, move=None):
         self.field = field
         self.penalty = GAMEOVER
-        self.children = {}
+        self.children = []
+        self.move = move
+        self.parent = parent
 
     def update(self, figure, position):
         self.penalty = self.field.put(figure, position)
         return self.penalty
 
-    def expand(self, stack=None):
+    def expand(self, stack):
+        global best
         if stack:
             figures = [stack[0]]
         else:
@@ -160,21 +163,22 @@ class Node:
                 if f not in check:
                     check.append(f)
                     work[i] = f
-        nodes = []
+
         for r, f in work.items():
             figure = Figure(f)
             for i in range(self.field.width - figure.width + 1):
-                node = Node(deepcopy(self.field))
+                node = Node(deepcopy(self.field), self, (r, i))
                 try:
-                    nodes.append((r, i, node, node.update(figure, i)))
+                    penalty = node.update(figure, i)
                 except GameOver:
-                    continue
-        global best
-        if stack:
-            for r, pos, node, score in sorted(nodes, key=lambda a: -a[-1])[-3:]:
-                self.children[(r, pos)] = node
-                node.expand(stack[1:])
-                best.append(node)
+                    penalty = GAMEOVER
+                self.children.append((r, i, node, penalty))
+                if best[1] > penalty:
+                    best = (node, penalty)
+
+        self.children = sorted(self.children, key=lambda a: a[-1])
+        for r, pos, node, score in self.children[:len(stack)]:
+            node.expand(stack[1:])
 
 
 class Tree:
@@ -182,7 +186,7 @@ class Tree:
 
     def __init__(self, stack):
         self.best_move = None
-        self.root = Node(Field())
+        self.root = Node(Field(), 'root')
         self.root.expand(stack)
 
     def move(self, next):
