@@ -1,5 +1,7 @@
 def get_xy(diagonal, element):
-    on_diag = min([i for i in diagonal if i > element])
+    if element == 1:
+        return 0, 0
+    on_diag = min([i for i in diagonal if i >= element])
     edge = diagonal.index(on_diag)
     x, y = [edge]*2
     diff = on_diag - element
@@ -26,16 +28,13 @@ def checkio(data):
         i += 2
     x_a, y_a = get_xy(diagonal, a)
     x_b, y_b = get_xy(diagonal, b)
-    print(x_a, y_a, x_b, y_b)
     return abs(x_a - x_b) + abs(y_a - y_b)
 
 if __name__ == '__main__':
-    diagonal = [i**2 for i in range(1, 100, 2)]
-    for i in range(2, 20):
-        print(get_xy(diagonal, i))
-#    assert checkio([1, 9]) == 2, "First"
-#    assert checkio([9, 1]) == 2, "Reverse First"
-#    assert checkio([10, 25]) == 1, "Neighbours"
-#    assert checkio([5, 9]) == 4, "Diagonal"
-#    assert checio([26, 31]) == 5, "One row"
+    assert checkio([1, 9]) == 2, "First"
+    assert checkio([9, 1]) == 2, "Reverse First"
+    assert checkio([10, 25]) == 1, "Neighbours"
+    assert checkio([5, 9]) == 4, "Diagonal"
+    assert checkio([26, 31]) == 5, "One row"
     assert checkio([50, 16]) == 10, "One more test"
+    print('Ok')
