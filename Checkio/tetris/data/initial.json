@@ -1,0 +1,6 @@
+{"width": 10, "position": 4, "figures": [[[true, true, true, true]],
+[[true, true], [true, true]], [[false, true, true], [true, true,
+false]], [[true, true, false], [false, true, true]], [[false, true,
+false], [true, true, true]], [[true, false], [true, false], [true,
+true]], [[false, true], [false, true], [true, true]]], "know_next": 3,
+"height": 8}
