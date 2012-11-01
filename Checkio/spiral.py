@@ -1,10 +1,16 @@
-def get_xy(diagonal, element):
+from itertools import *
+
+def get_xy(element):
     if element == 1:
         return 0, 0
-    on_diag = min([i for i in diagonal if i >= element])
+    diagonal = [(i+1)**2 for i in takewhile(
+        lambda i: (i-1)**2 < element, count(step=2)
+        )]
+    on_diag = max(diagonal)
     edge = diagonal.index(on_diag)
     x, y = [edge]*2
     diff = on_diag - element
+
     sector, shift = diff // edge, diff % edge
     if sector < 2:
         y -= sector*edge + shift
@@ -18,22 +24,18 @@ def get_xy(diagonal, element):
         x -= 2*edge - shift - (sector-6)*edge
     return x, y
 
+
 def checkio(data):
     "Find the destination"
     a, b = data
-    diagonal = [1]
-    i = 3
-    while diagonal[-1] < max(a, b):
-        diagonal.append(i**2)
-        i += 2
-    x_a, y_a = get_xy(diagonal, a)
-    x_b, y_b = get_xy(diagonal, b)
+    x_a, y_a = get_xy(a)
+    x_b, y_b = get_xy(b)
     return abs(x_a - x_b) + abs(y_a - y_b)
 
+
 if __name__ == '__main__':
-    diagonal = [i**2 for i in range(1,20)]
-    for i in range(1, 100):
-        print('{}\t{}'.format(i, get_xy(diagonal, i)))
+    for i in range(1, 50):
+        print('{}\t{}'.format(i, get_xy(i)))
     assert checkio([1, 9]) == 2, "First"
     assert checkio([9, 1]) == 2, "Reverse First"
     assert checkio([10, 25]) == 1, "Neighbours"
