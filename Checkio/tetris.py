@@ -6,39 +6,39 @@ from sys import stdout
 
 FIGURES = (
         (
-            (1,),
-            (1,),
-            (1,),
-            (1,),
+            (True,),
+            (True,),
+            (True,),
+            (True,),
             ),
         (
-            (1,1),
-            (1,1),
+            (True,True),
+            (True,True),
             ),
         (
-            (1,1),
-            (1,0),
-            (1,0),
+            (True,True),
+            (True,False),
+            (True,False),
             ),
         (
-            (1,1),
-            (0,1),
-            (0,1),
+            (True,True),
+            (False,True),
+            (False,True),
             ),
         (
-            (1,0),
-            (1,1),
-            (1,0),
+            (True,False),
+            (True,True),
+            (True,False),
             ),
         (
-            (1,0),
-            (1,1),
-            (0,1),
+            (True,False),
+            (True,True),
+            (False,True),
             ),
         (
-            (0,1),
-            (1,1),
-            (1,0),
+            (False,True),
+            (True,True),
+            (True,False),
             ),
         )
 
@@ -89,7 +89,7 @@ class Figure:
 
 class Field:
 
-    def __init__(self, width=10, height=12, deadline=0):
+    def __init__(self, width=10, height=12, deadline=4):
         self.data = []
         self.width = width
         self.height = height
@@ -107,8 +107,7 @@ class Field:
             for i, a in enumerate(fig_row):
                 self.data[field_row-j-1][position+i] += a
 
-        if sum(self.data[self.deadline]) > 0:
-            raise GameOver()
+        if all(self.data[self.deadline]):
             return GAMEOVER
 
         clear = []
@@ -133,6 +132,7 @@ class Field:
 
 best = (None, GAMEOVER)
 
+
 class Node:
     '''Decision tree node'''
 
@@ -151,8 +151,6 @@ class Node:
         global best
         if stack:
             figures = [stack[0]]
-        else:
-            figures = FIGURES
         check = []
         work = {}
         for f in figures:
@@ -168,10 +166,7 @@ class Node:
             figure = Figure(f)
             for i in range(self.field.width - figure.width + 1):
                 node = Node(deepcopy(self.field), self, (r, i))
-                try:
-                    penalty = node.update(figure, i)
-                except GameOver:
-                    penalty = GAMEOVER
+                penalty = node.update(figure, i)
                 self.children.append((r, i, node, penalty))
                 if best[1] > penalty:
                     best = (node, penalty)
