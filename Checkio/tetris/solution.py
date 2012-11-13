@@ -87,8 +87,6 @@ class Field:
         d = 0.05
         return 100 + a*holes(self.data) + b*max(self.top) + d*sum(self.top) - c*(len(clear)+1)**2
 
-best = (None, GAMEOVER)
-
 
 class Node:
     '''Decision tree node'''
@@ -96,9 +94,11 @@ class Node:
     def __init__(self, field, parent, move=None):
         self.field = field
         self.penalty = GAMEOVER
+        self.best = self, GAMEOVER
         self.children = []
         self.parent = parent
         self.encode_move(move)
+        self.expanded = 0
 
     def update(self, figure, position):
         self.penalty = self.field.put(figure, position)
@@ -107,7 +107,6 @@ class Node:
     def expand(self, stack):
         if not stack:
             return
-        global best
         figure = stack[0]
         check = []
         work = {}
@@ -125,12 +124,17 @@ class Node:
                 node = Node(deepcopy(self.field), self, (r, i))
                 penalty = node.update(figure, i)
                 self.children.append((r, i, node, penalty))
-                if best[1] > penalty:
-                    best = (node, penalty)
 
         self.children = sorted(self.children, key=lambda a: a[-1])
+
         for r, pos, node, score in self.children[:len(stack)]:
-            node.expand(stack[1:])
+            res = node.expand(stack[1:])
+            if res and res[1] < self.best[1]:
+                self.best = res
+        self.expanded = len(stack)
+        if len(stack) == 1:
+            return self.children[0][2], self.children[0][-1]
+        return self.best
 
     def encode_move(self, move):
         if not move:
@@ -151,7 +155,9 @@ class Tree:
 
     def move(self, next, stack):
         self.root.expand([next] + stack)
-
+        self.root = self.root.best[0]
+        print(self.root.best[0].move)
+        return self.root.move
 
 def holes(matrix):
     w = len(matrix[0])
@@ -195,17 +201,9 @@ def checkio(args):
     '''
     global i
     i += 1
-    print(i)
     clear = args['clear']
     field = args['map']
     future_figures = args['stack']
     figure = args['figure']
-
-    tree.move(figure, future_figures)
-    node = best[0]
-    while 1:
-        print("+++++", node.move)
-        if node.parent == 'root':
-            return node.move
-        node = node.parent
+    return tree.move(figure, future_figures)
     return ''
