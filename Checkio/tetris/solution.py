@@ -39,6 +39,7 @@ def rotate(data):
         rotated.append(r)
     return rotated
 
+
 class Figure:
 
     def __init__(self, matrix):
@@ -123,11 +124,13 @@ class Field:
 
         a = 0.6
         b = 1
-        c = 50
+        c = 10
         d = 0.5
         p = 1.5
         p_top = [t**p for t in self.top]
         return 100 + a*holes(self.data) + b*max(p_top) + d*sum(p_top) - c*(len(clear)+1)**2
+
+best = None
 
 
 class Node:
@@ -160,6 +163,8 @@ class Node:
         return self.penalty
 
     def expand(self, stack):
+        global best
+
         if not stack:
             return self.best_leave
 
@@ -196,10 +201,12 @@ class Node:
 
         for node in self.children[:len(stack)+1]:
             best_leave = node.expand(stack[1:])
-            if self.penalty == GAMEOVER:
+            if node.penalty == GAMEOVER:
                 best_leave = GAMEOVER # exclude GameOver nodes
             self.best_leave = best_leave
         if len(stack) == 1:
+            if best.penalty > self.children[0].penalty:
+                best = self.children[0]
             return self.children[0].penalty
         return self.best_leave
 
@@ -219,12 +226,17 @@ class Tree:
 
     def __init__(self):
         self.root = Node(Field())
+        global best
+        best = self.root
 
     def move(self, next, stack):
+        global best
+        best.penalty = GAMEOVER
         s = [next] + list(reversed(stack))
-        print([fig_rep[tuple(tuple(i) for i in a)] for a in s])
+#        print([fig_rep[tuple(tuple(i) for i in a)] for a in s])
         self.root.expand(s)
         node = sorted(self.root.children, key=lambda c: c.best_leave)[0]
+        print(best)
         self.root = node
         return node.move
 
