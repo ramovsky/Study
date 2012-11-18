@@ -61,6 +61,7 @@ def turn_figure(figure, clockwise=True):
         return turn_figure_clockwise(figure)
     return turn_figure_anticlockwise(figure)
 
+
 def gen_map(width, height):
     return [[False] * width for _ in range(height)]
 
@@ -72,6 +73,7 @@ def gen_checkio(data):
     for _ in range(turn_count):
         figure = turn_figure(figure, clockwise)
     return figure
+
 
 def initial_checkio(next_in):
     global MAP
@@ -135,7 +137,6 @@ def burn_lines(gmap):
     return num_rows, gmap
 
 
-
 def view_map(gmap, width=None):
     if width is None:
         width = len(gmap[0])
@@ -144,6 +145,7 @@ def view_map(gmap, width=None):
     result_map.append(empty_row)
     return result_map
 
+
 def checkio(next_in):
     global MAP
     global KNOW_NEXT
@@ -151,8 +153,6 @@ def checkio(next_in):
     global POSITION
     global SCORE
     global CURFIGURE
-
-
 
     if not isinstance(next_in, str):
         raise FailTest('checkio() function must return string')
