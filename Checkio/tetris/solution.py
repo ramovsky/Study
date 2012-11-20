@@ -14,6 +14,18 @@ fig_rep = {
     }
 
 
+def figure_to_char(figure):
+    return fig_rep[tuple(tuple(i) for i in a)]
+
+
+def view_to_matrix(view):
+    matrix = []
+    for row in view.split('\n'):
+        if row:
+            matrix.append([e == '#' for e in row])
+    return matrix
+
+
 def holes(matrix):
     w = len(matrix[0])
     h = len(matrix)
@@ -233,7 +245,6 @@ class Tree:
         global best
         best.penalty = GAMEOVER
         s = [next] + list(reversed(stack))
-#        print([fig_rep[tuple(tuple(i) for i in a)] for a in s])
         self.root.expand(s)
         node = sorted(self.root.children, key=lambda c: c.best_leave)[0]
         print(best)
@@ -263,3 +274,29 @@ def checkio(args):
     future_figures = args['stack']
     figure = args['figure']
     return tree.move(figure, future_figures)
+
+
+# test
+
+assert holes(
+    view_to_matrix(
+        """
+#####......
+###.#######
+###...#####
+####.#####."""
+        )) == 6, 'Holes count'
+
+assert rotate(
+    view_to_matrix(
+"""
+.##
+##.
+"""
+        )) == view_to_matrix(
+"""
+#.
+##
+.#
+"""
+            ), 'Rotation'
