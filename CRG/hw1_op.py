@@ -1,5 +1,6 @@
 import string
 from random import choice
+from collections import defaultdict
 
 MSGS = (
     b'I love lol troll face',
@@ -48,7 +49,7 @@ def test():
 
 def main():
     test()
-    all_letters = (string.ascii_letters + string.digits).encode('ascii')
+    all_letters = (string.ascii_letters + string.digits + ' ').encode('ascii')
     xored_space = strxor(b' '*len(all_letters), all_letters)
 
     spaces = [[0]*200 for i in range(len(HEXMSGS))]
@@ -60,15 +61,17 @@ def main():
                 spaces[i][j] += 1 if char in xored_space else 0
     print(spaces)
 
-    key = [b' ']*200
+    key = bytearray(b' '*200)
+    weights = defaultdict(int)
     for i, m in enumerate(spaces):
         for j, w in enumerate(m):
-            if w > 5:
-                if key[j] == b' ':
-                    key[j] = ord(key[j]) ^ HEXMSGS[i][j]
-                else:
-                    print(key[j], key[j] ^ HEXMSGS[i][j])
+            if w > weights[j]:
+                key[j] = 32 ^ HEXMSGS[i][j]
+                weights[j] = w
+#            else:
+#                print(key[j], 32 ^ HEXMSGS[i][j])
     print(key)
+    print(strxor(key, HEXMSGS[-1]))
 
 
 main()
