@@ -71,7 +71,13 @@ def main():
 #            else:
 #                print(key[j], 32 ^ HEXMSGS[i][j])
     print(key)
-    print(strxor(key, HEXMSGS[-1]))
+    for m in HEXMSGS:
+        print(strxor(key, m))
+
+    m = b'attack at dawn'
+    c = bytes.fromhex('09e1c5f70a65ac519458e7e53f36')
+    k = strxor(m, c)
+    print(k, strxor(k, b'attack at dusk'))
 
 
 main()
