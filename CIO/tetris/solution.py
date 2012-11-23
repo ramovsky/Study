@@ -26,20 +26,6 @@ def view_to_matrix(view):
     return matrix
 
 
-def holes(matrix):
-    w = len(matrix[0])
-    h = len(matrix)
-    count = 0
-    for i in range(w):
-        found = False
-        for j in range(h):
-            if found and not matrix[j][i]:
-                count += 1
-            if matrix[j][i]:
-                found = True
-    return count
-
-
 def rotate(data):
     rotated = []
     w = len(data[0])
@@ -87,6 +73,8 @@ class Field:
         self.deadline = deadline
         self.data = [[False]*width for i in range(height)]
         self.top = [0]*width
+        self.holes = [0]*width
+        self.baricades = 0
 
     def __repr__(self):
         ret = ''
@@ -109,6 +97,15 @@ class Field:
         if all(self.data[self.deadline]):
             return GAMEOVER
 
+        self.top[position:position+figure.width] = [dive+i for i in figure.top]
+#        self.holes += sum(abs(sum(a)) for a in zip(top_slice, figure.bottom, [-dive]*figure.width))
+        for i in range(figure.width):
+            holes = top_slice[i] + figure.bottom[i] - dive
+            if holes:
+                self.holes[position+i] += abs(holes)
+            if self.holes[position+i]:
+                self.baricades += figure.top[i] + figure.bottom[i]
+
         clear = []
         for i, row in enumerate(self.data):
             if sum(row) == self.width:
@@ -117,10 +114,10 @@ class Field:
             self.data.pop(c)
             self.data.insert(0, [False]*self.width)
 
-        self.top[position:position+figure.width] = [dive+i for i in figure.top]
-
         if clear:
-            self.top = [self.deadline+1] * self.width
+            self.calc_holes()
+            self.calc_baricades()
+            self.top = [self.deadline+1]*self.width
             for j in range(self.width):
                 for i in range(self.height):
                     if self.data[i][j]:
@@ -132,7 +129,29 @@ class Field:
         c = 10
         d = 0.5
         p = 1.5
-        return 100 + a*holes(self.data) + b*max(self.top) + d*sum(self.top) - c*(len(clear)+1)**2
+        return 100 + a*sum(self.holes) + b*max(self.top) + d*sum(self.top) - c*(len(clear)+1)**2
+
+    def calc_holes(self):
+        self.holes = [0]*self.width
+        for i in range(self.width):
+            found = False
+            for j in range(self.height):
+                if found and not self.data[j][i]:
+                    self.holes[i] += 1
+                if self.data[j][i]:
+                    found = True
+
+    def calc_baricades(self):
+        self.baricades = 0
+        for i in range(self.width):
+            if not self.holes[i]:
+                continue
+            found = False
+            for j in reversed(range(self.height)):
+                if found and self.data[j][i]:
+                    self.baricades += 1
+                if not self.data[j][i]:
+                    found = True
 
 best = None
 
@@ -268,13 +287,6 @@ def checkio(args):
 
 
 # test
-
-field_map = """
-#####......
-###.#######
-###...#####
-####.#####."""
-
 figures = list(map(view_to_matrix, [
 """
 .##
@@ -293,14 +305,13 @@ figures = list(map(view_to_matrix, [
 """
 ]))
 
-assert holes(view_to_matrix(field_map)) == 6, 'Holes count'
-
-field = Field(5, 5, 4)
+field = Field(5, 6, 5)
 field.put(Figure(figures[1]))
 field.put(Figure(figures[1]), 1)
 field.put(Figure(figures[1]), 2)
 
 assert field.data == view_to_matrix("""
+.....
 ..##.
 .###.
 ####.
@@ -308,10 +319,13 @@ assert field.data == view_to_matrix("""
 .#..."""), 'Put'
 
 assert field.top == [3, 4, 5, 5, 0], 'Top 1'
+assert field.holes == [2, 0, 1, 2, 0], 'Holes 1'
+assert field.baricades == 8, 'Baricades 1'
 
 field.put(Figure(figures[2]), 4)
 
 assert field.data == view_to_matrix("""
+.....
 .....
 ..##.
 .####
@@ -319,3 +333,32 @@ assert field.data == view_to_matrix("""
 .#..#"""), 'Clear'
 
 assert field.top == [0, 3, 4, 4, 3], 'Top after clear'
+assert field.holes == [0, 0, 1, 2, 0], 'Holes after clear'
+assert field.baricades == 5, 'Baricades after clear'
+
+field.put(Figure(figures[1]))
+
+assert field.data == view_to_matrix("""
+##...
+.#...
+.###.
+.####
+.##.#
+.#..#"""), 'Mega hole'
+assert field.holes == [5,0,1,2,0], 'Big holes'
+assert field.baricades == 6, 'Big hole Baricades'
+
+
+field = Field(5, 6, 5)
+field.put(Figure(figures[1]))
+field.put(Figure(figures[1]))
+assert field.data == view_to_matrix("""
+##...
+.#...
+.#...
+##...
+.#...
+.#..."""), 'two holes'
+assert field.holes == [4,0,0,0,0], 'Two holes'
+assert field.baricades == 2, 'Two hole Baricades'
+
