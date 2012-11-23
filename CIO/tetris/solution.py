@@ -75,17 +75,6 @@ class Figure:
                     break
                 self.bottom[j] -= 1
 
-    def rotate(self):
-        rotated = []
-        for i in range(self.width):
-            r = []
-            for j in range(self.height, 0, -1):
-                r.append(self.data[j-1][i])
-            rotated.append(r)
-        self.data = rotated
-        self.updte_profile()
-        return rotated
-
     def __eq__(self, other):
         return self.data == other.data
 
@@ -93,12 +82,10 @@ class Figure:
 class Field:
 
     def __init__(self, width=10, height=12, deadline=5):
-        self.data = []
         self.width = width
         self.height = height
         self.deadline = deadline
-        for i in range(height):
-            self.data.append([False]*width)
+        self.data = [[False]*width for i in range(height)]
         self.top = [0]*width
 
     def __repr__(self):
@@ -113,9 +100,11 @@ class Field:
         top_slice = self.top[position: position+figure.width]
         dive = max(map(sum, zip(top_slice, figure.bottom)))
         field_row = self.height - dive
+
         for j, fig_row in enumerate(reversed(figure.data)):
             for i, a in enumerate(fig_row):
-                self.data[field_row-j-1][position+i] += a
+                assert not(self.data[field_row-j-1][position+i] and a)
+                self.data[field_row-j-1][position+i] |= a
 
         if all(self.data[self.deadline]):
             return GAMEOVER
@@ -126,21 +115,24 @@ class Field:
                 clear.append(i)
         for c in clear:
             self.data.pop(c)
-            self.data.insert(0, [0]*self.width)
-        self.top = [self.height] * self.width
-        for j in range(self.width):
-            for i in range(self.height):
-                if self.data[i][j]:
-                    break
-                self.top[j] -= 1
+            self.data.insert(0, [False]*self.width)
+
+        self.top[position:position+figure.width] = [dive+i for i in figure.top]
+
+        if clear:
+            self.top = [self.deadline+1] * self.width
+            for j in range(self.width):
+                for i in range(self.height):
+                    if self.data[i][j]:
+                        break
+                    self.top[j] -= 1
 
         a = 0.6
         b = 1
         c = 10
         d = 0.5
         p = 1.5
-        p_top = [t**p for t in self.top]
-        return 100 + a*holes(self.data) + b*max(p_top) + d*sum(p_top) - c*(len(clear)+1)**2
+        return 100 + a*holes(self.data) + b*max(self.top) + d*sum(self.top) - c*(len(clear)+1)**2
 
 best = None
 
@@ -247,7 +239,6 @@ class Tree:
         s = [next] + list(reversed(stack))
         self.root.expand(s)
         node = sorted(self.root.children, key=lambda c: c.best_leave)[0]
-        print(best)
         self.root = node
         return node.move
 
@@ -278,25 +269,53 @@ def checkio(args):
 
 # test
 
-assert holes(
-    view_to_matrix(
-        """
+field_map = """
 #####......
 ###.#######
 ###...#####
 ####.#####."""
-        )) == 6, 'Holes count'
 
-assert rotate(
-    view_to_matrix(
+figures = list(map(view_to_matrix, [
 """
 .##
 ##.
+""",
 """
-        )) == view_to_matrix(
-"""
-#.
 ##
 .#
+.#
+""",
 """
-            ), 'Rotation'
+#
+#
+#
+#
+"""
+]))
+
+assert holes(view_to_matrix(field_map)) == 6, 'Holes count'
+
+field = Field(5, 5, 4)
+field.put(Figure(figures[1]))
+field.put(Figure(figures[1]), 1)
+field.put(Figure(figures[1]), 2)
+
+assert field.data == view_to_matrix("""
+..##.
+.###.
+####.
+.##..
+.#..."""), 'Put'
+
+assert field.top == [3, 4, 5, 5, 0], 'Top 1'
+
+field.put(Figure(figures[2]), 4)
+
+assert field.data == view_to_matrix("""
+.....
+..##.
+.####
+.##.#
+.#..#"""), 'Clear'
+
+assert field.top == [0, 3, 4, 4, 3], 'Top after clear'
