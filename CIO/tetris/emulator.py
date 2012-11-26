@@ -9,6 +9,14 @@ class Figure:
         self.width = len(matrix[0])
         self.height = len(matrix)
 
+    def __repr__(self):
+        ret = '\n'
+        addition = ['top: {}'.format(self.top), 'Figure']        
+        for row in self.data:
+            ret += ''.join('#' if i else '.' for i in row)
+            ret += '\t{}\n'.format(addition.pop()) if addition else '\n'
+        return ret
+
     def updte_profile(self):
         self.width = w = len(self.data[0])
         self.height = h = len(self.data)
@@ -40,7 +48,7 @@ class Field:
         self.barricades = 0
 
     def __repr__(self):
-        ret = ''
+        ret = '\n'
         addition = ['top: {}'.format(self.top), 'Field']
         for row in self.data:
             ret += ''.join('#' if i else '.' for i in row)
@@ -54,10 +62,14 @@ class Field:
 
         for j, fig_row in enumerate(reversed(figure.data)):
             for i, a in enumerate(fig_row):
-                assert not(self.data[field_row-j-1][position+i] and a)
+                try:
+                    assert not(self.data[field_row-j-1][position+i] and a)
+                except AssertionError:
+                    from IPython.core.debugger import Pdb
+                    Pdb().set_trace()
                 self.data[field_row-j-1][position+i] |= a
 
-        if all(self.data[self.deadline]):
+        if any(self.data[self.deadline]):
             return GAMEOVER
 
         clear = self.clear()
@@ -71,6 +83,8 @@ class Field:
                     self.holes[position+i] += abs(holes)
                 if self.holes[position+i]:
                     self.barricades += figure.top[i] + figure.bottom[i]
+
+        assert [i for i in self.top if i < 0] == [], 'Negative top'
 
         a = 0.6
         b = 1
@@ -90,12 +104,12 @@ class Field:
 
         if cleared:
             # Updating top
-            self.top = [self.deadline+1]*self.width
+            self.top = [self.height]*self.width
             for j in range(self.width):
                 for i in range(self.height):
                     if self.data[i][j]:
                         break
-                    self.top[j] -= 1
+                self.top[j] -= i
 
             # Updating holes
             self.holes = [0]*self.width
