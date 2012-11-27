@@ -94,12 +94,9 @@ class Field:
         return 100 + a*sum(self.holes) + b*max(self.top) + d*sum(self.top) - c*(clear+1)**2
 
     def clear(self):
-        cleared = []
-        for i, row in enumerate(self.data):
-            if sum(row) == self.width:
-                cleared.append(i)
-        for c in cleared:
-            self.data.pop(c)
+        self.data = [row for row in self.data if not all(row)]
+        cleared = self.height - len(self.data)
+        for i in range(cleared):
             self.data.insert(0, [False]*self.width)
 
         if cleared:
@@ -109,7 +106,7 @@ class Field:
                 for i in range(self.height):
                     if self.data[i][j]:
                         break
-                self.top[j] -= i
+                    self.top[j] -= 1
 
             # Updating holes
             self.holes = [0]*self.width
@@ -133,4 +130,4 @@ class Field:
                     if not self.data[j][i]:
                         found = True
 
-        return len(cleared)
+        return cleared

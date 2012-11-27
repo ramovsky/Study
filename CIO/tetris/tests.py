@@ -30,13 +30,14 @@ figures = list(map(view_to_matrix, [
 class Base(unittest.TestCase):
 
     def test_put(self):
-        field = Field(5, 6, 5)
+        field = Field(5, 7, 0)
         field.put(Figure(figures[1]))
         field.put(Figure(figures[1]), 1)
         field.put(Figure(figures[1]), 2)
 
         self.assertEqual(field.data, view_to_matrix(
             """
+            .....
             .....
             ..##.
             .###.
@@ -47,11 +48,12 @@ class Base(unittest.TestCase):
         self.assertEqual(field.top, [3, 4, 5, 5, 0])
         self.assertEqual(field.holes, [2, 0, 1, 2, 0])
         self.assertEqual(field.barricades, 8)
-
+        
         field.put(Figure(figures[2]), 4)
 
         self.assertEqual(field.data, view_to_matrix(
             """
+            .....
             .....
             .....
             ..##.
@@ -67,6 +69,7 @@ class Base(unittest.TestCase):
 
         self.assertEqual(field.data, view_to_matrix(
             """
+            .....
             ##...
             .#...
             .###.
@@ -78,11 +81,12 @@ class Base(unittest.TestCase):
         self.assertEqual(field.barricades, 6)
 
     def test_two_holes(self):
-        field = Field(5, 6, 5)
+        field = Field(5, 7, 0)
         field.put(Figure(figures[1]))
         field.put(Figure(figures[1]))
         self.assertEqual(field.data, view_to_matrix(
             """
+            .....
             ##...
             .#...
             .#...
