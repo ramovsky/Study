@@ -82,10 +82,10 @@ class Node:
 
             self.children = sorted(self.children, key=lambda c: c.penalty)
 
-        for node in self.children[:len(stack)+1]:
-            best_leave = node.expand(stack[1:])
+        for node in self.children[:len(stack)+4]:
             if node.penalty == GAMEOVER:
-                best_leave = GAMEOVER # exclude GameOver nodes
+                return GAMEOVER # exclude GameOver nodes
+            best_leave = node.expand(stack[1:])
             self.best_leave = best_leave
         if len(stack) == 1:
             if best.penalty > self.children[0].penalty:

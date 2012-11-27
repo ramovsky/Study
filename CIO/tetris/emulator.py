@@ -38,7 +38,7 @@ class Figure:
 
 class Field:
 
-    def __init__(self, width=10, height=12, deadline=5):
+    def __init__(self, width=10, height=12, deadline=3):
         self.width = width
         self.height = height
         self.deadline = deadline
