@@ -1,4 +1,5 @@
 import string
+import binascii
 from random import choice
 from collections import defaultdict
 
@@ -68,16 +69,15 @@ def main():
             if w > weights[j]:
                 key[j] = 32 ^ HEXMSGS[i][j]
                 weights[j] = w
-#            else:
-#                print(key[j], 32 ^ HEXMSGS[i][j])
+
     print(key)
     for m in HEXMSGS:
         print(strxor(key, m))
 
     m = b'attack at dawn'
-    c = bytes.fromhex('09e1c5f70a65ac519458e7e53f36')
+    c = bytes.fromhex('6c73d5240a948c86981bc294814d')
     k = strxor(m, c)
-    print(k, strxor(k, b'attack at dusk'))
+    print(binascii.hexlify(strxor(k, b'attack at dusk')))
 
 
 main()
