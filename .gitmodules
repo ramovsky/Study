@@ -1,0 +1,3 @@
+[submodule "PYA"]
+	path = PYA
+	url = git@github.com:ramovsky/advanced-01.git
