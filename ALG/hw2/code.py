@@ -4,8 +4,9 @@ SWAPS = 0
 
 
 def find_pivot(arr):
-    l = len(arr)//2
+    l = (len(arr)-1)//2
     a = sorted([(arr[0], 0), (arr[l], l), (arr[-1], -1)])
+#    print(a)
     return a[1][1]
 
 
@@ -38,7 +39,7 @@ def main():
         data = [int(r) for r in f.read().split('\n') if r]
 
 
-    find_pivot([2,4,23,5,3,220,3,45,13,455,22])
+    print(find_pivot([2,4,3]))
 
     quick_sort(data)
     print(SWAPS)
