@@ -1,5 +1,9 @@
 import pickle
+import sys
+from collections import deque
 from random import choice, shuffle
+
+sys.setrecursionlimit(1000000)
 
 
 class Graph(object):
@@ -24,7 +28,48 @@ class Graph(object):
         d.set_in(o.id)
 
     def calc_finish(self):
-        pass
+        print('First pass')
+        ft = 0
+        sizes = []
+        q = deque()
+        first = list(sorted(self.nodes.values(), key=lambda x: x.id, reverse=True))
+        for node in first:
+            if node.bck:
+                continue
+            self.dfs(node, q, False)
+            while q:
+                ft += 1
+                n = q.pop()
+                n.set_finish(ft)
+
+        print('Second pass')
+        second = list(sorted(self.nodes.values(), key=lambda x: x.finish, reverse=True))
+        for node in second:
+            if node.fwd:
+                continue
+            q = deque()
+            self.dfs(node, q)
+            sizes.append(len(q))
+
+        sizes.sort(reverse=True)
+        print(sizes[:10])
+
+    def dfs(self, node, queue, fw=True):
+        queue.append(node)
+        if fw:
+            node.fwd = True
+            for n in node.outgoing:
+                n = self.get_node(n)
+                if n.fwd:
+                    continue
+                self.dfs(n, queue, fw)
+        else:
+            node.bck = True
+            for n in node.incoming:
+                n = self.get_node(n)
+                if n.bck:
+                    continue
+                self.dfs(n, queue, fw)
 
 
 class Node(object):
@@ -34,6 +79,8 @@ class Node(object):
         self.finish = None
         self.incoming = set()
         self.outgoing = set()
+        self.fwd = False
+        self.bck = False
 
     def __repr__(self):
         return '<Node {}. in:{} out:{}>'.format(self.id, self.incoming, self.outgoing)
@@ -55,20 +102,17 @@ def main():
             graph = pickle.load(f)
     except:
         graph = Graph()
-        with open('SCC.txt', 'rt') as f:
-            i = 0
+        with open(sys.argv[1], 'rt') as f:
             for r in f.read().split('\n'):
                 if not r:
                     continue
                 graph.add_data(*tuple(map(int, r.split(' ', 1))))
-                i += 1
-                if i < 0:
-                    break
+
 
         with open('graph', 'wb') as f:
             pickle.dump(graph, f)
 
-    print(graph.nodes[1])
+    graph.calc_finish()
 
 
 if __name__ == '__main__':
