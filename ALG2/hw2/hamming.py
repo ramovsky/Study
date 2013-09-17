@@ -3,6 +3,9 @@ from random import shuffle
 SIZE = 32
 to_bin = lambda i: '{:.>7}'.format(bin(i)[2:])
 
+def bin2gray(i):
+    return i//2 ^ i
+
 
 def hamming_distance(s1, s2):
     return sum(ch1 != ch2 for ch1, ch2 in zip(to_bin(s1), to_bin(s2)))
@@ -22,19 +25,8 @@ def wide_print(*pairs):
 def main():
     lst = list(range(SIZE))
 
-    lst2 = [0]
-    while len(lst2) < SIZE:
-        for e in lst:
-            if e in lst2:
-                continue
-            if hamming_distance(lst2[-1], e) == 1:
-                lst2.append(e)
-                lst.remove(e)
-                break
-        else:
-            lst.append(lst2.pop())
+    lst2 = list(map(bin2gray, lst))
 
-    lst = list(range(SIZE))
     wide_print(lst, lst2)
 
 

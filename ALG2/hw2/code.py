@@ -1,56 +1,42 @@
-SIZE = 32
-to_bin = lambda i: '{:>7}'.format(bin(i)[2:])
+import sys
 
 
-def switch(lst, start, shift, step=4):
-    lst = lst[:]
-    for i in range(start, SIZE, step):
-        j = i + shift
-        lst[i], lst[j] = lst[j], lst[i]
-    return lst
+def bin2gray(i):
+    return i//2 ^ i
 
 
-def move(lst, start, shift, step=4):
-    lst = lst[:]
-    for i in range(start, SIZE, step):
-        j = i + shift
-        lst.insert(j, lst.pop(i))
-    return lst
-
-
-def wide_print(*pairs):
-    s = ''
-    previous = [p[0] for p in pairs]
-    for i, p in enumerate(zip(*pairs)):
-        s = '{:>3}\t'.format(i)
-        for l, e in zip(previous, p):
-            s += '{} {} {:<3}\t'.format(to_bin(l^e), to_bin(e), e)
-        print(s)
-        previous = p
+def hamming_distance(s1, s2):
+    return sum(ch1 != ch2 for ch1, ch2 in zip(s1, s2))
 
 
 def main():
 
     if sys.argv[-1] == '3':
         with open('edges.txt', 'rt') as f:
-            graph = Graph()
+            pass
+
+    else:
+        lst = set()
+        with open('clustering_big.txt', 'rt') as f:
             for r in f.read().split('\n'):
                 if not r:
                     continue
-                graph.add_data(*map(int, r.split(' ')))
+                elif r == 'stop':
+                    break
+                b = r.replace(' ', '')
+                i = int(b, 2)
+                lst.add((i, b))
 
-
-    else:
-        lst = list(range(SIZE))
-        lst2 = lst[:]
-        i = 2
-        while i < SIZE:
-            i *= 2
-            j, k  = i-1, i-2
-            lst2[j], lst2[k] = lst2[k], lst2[j]
-
-        wide_print(lst, lst2)
-
+        clusters = 0
+        while lst:
+            c = lst.pop()
+            lst = sorted(lst, key=lambda x: hamming_distance(x[1], c[1]))
+            clusters += 1
+            print(clusters, len(lst))
+            for i, l in enumerate(lst):
+                if hamming_distance(l[1], c[1]) > 2:
+                    break
+            lst = lst[i:]
 
 
 if __name__ == '__main__':
