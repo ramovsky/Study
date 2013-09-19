@@ -3,8 +3,16 @@ from random import shuffle
 SIZE = 32
 to_bin = lambda i: '{:.>7}'.format(bin(i)[2:])
 
-def bin2gray(i):
+def int2gray(i):
     return i//2 ^ i
+
+
+def gray2int(g):
+    mask = g//2
+    while mask:
+        g = g ^ mask
+        mask = mask//2
+    return g
 
 
 def hamming_distance(s1, s2):
@@ -25,9 +33,10 @@ def wide_print(*pairs):
 def main():
     lst = list(range(SIZE))
 
-    lst2 = list(map(bin2gray, lst))
+    lst = sorted(lst, key=lambda x: gray2int(x))
 
-    wide_print(lst, lst2)
+    for i in lst:
+        print(i, int2gray(i), to_bin(i))
 
 
 if __name__ == '__main__':

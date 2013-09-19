@@ -9,13 +9,16 @@ def hamming_distance(s1, s2):
     return sum(ch1 != ch2 for ch1, ch2 in zip(s1, s2))
 
 
+max_rank = 0
+
+
 class Node:
 
     def __init__(self, bits):
         self.id = int(bits, 2)
         self.ones = bits.count('1')
         self.bits = bits
-        self.parent = None
+        self.parent = self
         self.rank = 0
 
     def __hash__(self):
@@ -38,19 +41,42 @@ class UnionFind:
 
     def __init__(self):
         self.nodes = {}
+        self.clusters = 0
+        self.rank = 0
 
-    def find(self, id):
-        if id not in seld.nodes:
-            return
-        parent = node = self.nodes[id]
-        while parent:
+    def add_node(self, bits):
+        node = Node(bits)
+        if node.id not in self.nodes:
+            self.nodes[node.id] = node
+            self.clusters += 1
+
+    def find(self, node):
+        while True:
+            if node.parent == node:
+                break
             node = node.parent
-            parent = node.parent
+
         return node
 
-    def union(self, id1, id2):
-        node1 = self.find(id1)
-        node2 = self.find(id2)
+    def union(self, node1, node2):
+        root1 = self.find(node1)
+        root2 = self.find(node2)
+        if root2 == root1:
+            return
+        if root2.rank > root1.rank:
+            root1.parent = root2
+        elif root2.rank == root1.rank:
+            root1.parent = root2
+            root2.rank += 1
+            if root2.rank > self.rank:
+                self.rank = root2.rank
+                print('rank', self.rank)
+        else:
+            root2.parent = root1
+        self.clusters -= 1
+
+    def distance(self, node1, node2):
+        return hamming_distance(node1.bits, node2.bits)
 
 
 
@@ -61,21 +87,30 @@ def main():
             pass
 
     else:
-        lst = set()
+        union_find = UnionFind()
         with open('clustering_big.txt', 'rt') as f:
             for r in f.read().split('\n'):
                 if not r:
                     continue
                 elif r == 'stop':
                     break
-                lst.add(Node(r.replace(' ', '')))
+                union_find.add_node(r.replace(' ', ''))
 
-        lst = sorted(lst)
-        c = lst[0]
-        for i, l in enumerate(lst):
-            if hamming_distance(l.bits, c.bits) < 3:
-                print('{:>10} {}'.format(i, l))
+        lst = sorted(union_find.nodes.values())
 
+        print(union_find.clusters)
+        n = len(lst)
+        for i in range(n):
+            print(i, union_find.clusters)
+            for j in range(i+1, n):
+                node1, node2 = lst[i], lst[j]
+                clustered.add({node1, node2})
+                if node2.ones - node1.ones > 2:
+                    break
+                if union_find.distance(node1, node2) < 3:
+                    union_find.union(node1, node2)
+
+        print(max_rank)
 
 if __name__ == '__main__':
     main()
