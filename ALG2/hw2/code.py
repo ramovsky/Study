@@ -1,5 +1,7 @@
 import sys
+from itertools import combinations_with_replacement
 
+to_bin = lambda i: '{:.>24}'.format(bin(i)[2:])
 
 def bin2gray(i):
     return i//2 ^ i
@@ -9,15 +11,10 @@ def hamming_distance(s1, s2):
     return sum(ch1 != ch2 for ch1, ch2 in zip(s1, s2))
 
 
-max_rank = 0
-
-
 class Node:
 
-    def __init__(self, bits):
-        self.id = int(bits, 2)
-        self.ones = bits.count('1')
-        self.bits = bits
+    def __init__(self, id):
+        self.id = id
         self.parent = self
         self.rank = 0
 
@@ -44,18 +41,21 @@ class UnionFind:
         self.clusters = 0
         self.rank = 0
 
-    def add_node(self, bits):
-        node = Node(bits)
-        if node.id not in self.nodes:
+    def add_node(self, id):
+        if id not in self.nodes:
+            node = Node(id)
             self.nodes[node.id] = node
             self.clusters += 1
 
     def find(self, node):
+        lst = [node]
         while True:
             if node.parent == node:
                 break
             node = node.parent
-
+            lst.append(node)
+        for n in lst:
+            n.parent = node
         return node
 
     def union(self, node1, node2):
@@ -70,7 +70,6 @@ class UnionFind:
             root2.rank += 1
             if root2.rank > self.rank:
                 self.rank = root2.rank
-                print('rank', self.rank)
         else:
             root2.parent = root1
         self.clusters -= 1
@@ -82,9 +81,28 @@ class UnionFind:
 
 def main():
 
-    if sys.argv[-1] == '3':
-        with open('edges.txt', 'rt') as f:
-            pass
+    if sys.argv[-1] == '1':
+        union_find = UnionFind()
+        with open('clustering1.txt', 'rt') as f:
+            edges = []
+            for r in f.read().split('\n'):
+                if not r:
+                    continue
+                elif r == 'stop':
+                    break
+                id1, id2, e = map(int, r.split(' '))
+                union_find.add_node(id1)
+                union_find.add_node(id2)
+                edges.append((e, id1, id2))
+
+        edges.sort(reverse=True)
+        print(len(edges), union_find.clusters)
+        while union_find.clusters > 4:
+            e, id1, id2 = edges.pop()
+            print(e)
+            node1, node2 = union_find.nodes[id1], union_find.nodes[id2]
+            union_find.union(node1, node2)
+        print(e, len(edges), union_find.clusters)
 
     else:
         union_find = UnionFind()
@@ -94,23 +112,23 @@ def main():
                     continue
                 elif r == 'stop':
                     break
-                union_find.add_node(r.replace(' ', ''))
+                id = int(r.replace(' ', ''), 2)
+                union_find.add_node(id)
 
-        lst = sorted(union_find.nodes.values())
+        masks = []
+        for l, r in combinations_with_replacement(range(24), 2):
+            masks.append(1 << l | 1 << r)
 
         print(union_find.clusters)
-        n = len(lst)
-        for i in range(n):
-            print(i, union_find.clusters)
-            for j in range(i+1, n):
-                node1, node2 = lst[i], lst[j]
-                clustered.add({node1, node2})
-                if node2.ones - node1.ones > 2:
-                    break
-                if union_find.distance(node1, node2) < 3:
-                    union_find.union(node1, node2)
+        for n in union_find.nodes.values():
+            for m in masks:
+                id2 = n.id ^ m
+                if id2 in union_find.nodes:
+                    node2 = union_find.nodes[id2]
+                    union_find.union(n, node2)
 
-        print(max_rank)
+        print(union_find.clusters)
+
 
 if __name__ == '__main__':
     main()
