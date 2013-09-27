@@ -1,4 +1,6 @@
+from itertools import *
 from random import shuffle
+
 
 SIZE = 32
 to_bin = lambda i: '{:.>7}'.format(bin(i)[2:])
@@ -31,13 +33,12 @@ def wide_print(*pairs):
 
 
 def main():
-    lst = list(range(SIZE))
-
-    lst = sorted(lst, key=lambda x: gray2int(x))
-
-    for i in lst:
-        print(i, int2gray(i), to_bin(i))
-
+    ret = []
+    for p in product('10', repeat=24):
+        if p.count('1') < 3:
+            ret.append(p)
+    print(len(ret))
+    print(ret)
 
 if __name__ == '__main__':
     main()

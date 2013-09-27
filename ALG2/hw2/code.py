@@ -97,11 +97,11 @@ def main():
 
         edges.sort(reverse=True)
         print(len(edges), union_find.clusters)
-        while union_find.clusters > 4:
+        while union_find.clusters > 3:
             e, id1, id2 = edges.pop()
-            print(e)
             node1, node2 = union_find.nodes[id1], union_find.nodes[id2]
             union_find.union(node1, node2)
+
         print(e, len(edges), union_find.clusters)
 
     else:
