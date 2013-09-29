@@ -1,66 +1,35 @@
 import sys
 from collections import defaultdict
 
-
-from queue import Queue
-
-
-class Node:
-    def __init__(self, level, profit, weight):
-        self.level = level # The level within the tree (depth)
-        self.profit = profit # The total profit
-        self.weight = weight # The total weight
-
-def solveKnapsack(weights, profits, knapsackSize):
-    numItems = len(weights)
-    queue = Queue()
-    root = Node(-1, 0, 0)
-    queue.put(root)
-
-    maxProfit = 0
-    bound = 0
-    while not queue.empty():
-        v = queue.get() # Get the next item on the queue
-
-        uLevel = v.level + 1
-        u = Node(uLevel, v.profit + profits[uLevel], v.weight + weights[uLevel])
-
-        bound = getBound(u, numItems, knapsackSize, weights, profits)
-
-        if u.weight <= knapsackSize and u.profit > maxProfit:
-            maxProfit = u.profit
-
-        if bound > maxProfit:
-            queue.put(u)
-
-        u = Node(uLevel, v.profit, v.weight)
-        bound = getBound(u, numItems, knapsackSize, weights, profits)
-
-        if (bound > maxProfit):
-            queue.put(u)
-    return maxProfit
+cache = defaultdict(dict)
+nodes = []
+hits = 0
 
 
-# This is essentially the brute force solution to the fractional knapsack
-def getBound(u, numItems, knapsackSize, weights, profits):
-    if u.weight >= knapsackSize: return 0
-    else:
-        upperBound = u.profit
-        totalWeight = u.weight
-        j = u.level + 1
-        while j < numItems and totalWeight + weights[j] <= knapsackSize:
-            upperBound += profits[j]
-            totalWeight += weights[j]
-            j += 1
-        if j < numItems:
-            upperBound += (knapsackSize - totalWeight) * profits[j]/weights[j]
-        return upperBound
+def solve_knapsack(i, size):
+#    print('.'*(7-i), i, size)
+    global hits
+    if i < 0:
+        return 0
+
+    if size in cache[i]:
+        hits += 1
+        return cache[i][size]
+
+    profit = solve_knapsack(i-1, size)
+    node = nodes[i]
+    if size >= node[1]:
+        profit = max(profit, solve_knapsack(i-1, size - node[1]) + node[0])
+    cache[i][size] = profit
+    return profit
 
 
 def main():
 
+    sys.setrecursionlimit(20000)
+
     if sys.argv[-1] == '2':
-        with open('knapsack_big.txt', 'rt') as f:
+        with open('knapsack1.txt', 'rt') as f:
             size = None
             values = []
             weights = []
@@ -71,13 +40,15 @@ def main():
                     break
                 v, w = map(int, r.split(' '))
                 if size is None:
-                    size = v+1
+                    size = v
                     items = w
                 else:
+                    nodes.append((v, w))
                     values.append(v)
                     weights.append(w)
 
-        print(solveKnapsack(weights, values, size))
+        print('ANS', solve_knapsack(items-1, size), hits)
+
 
     else:
         with open('knapsack1.txt', 'rt') as f:
@@ -91,7 +62,7 @@ def main():
                     break
                 v, w = map(int, r.split(' '))
                 if size is None:
-                    size = v+1
+                    size = v
                     items = w
                 else:
                     values.append(v)
@@ -100,7 +71,7 @@ def main():
         cache = defaultdict(int)
         print(len(values), len(weights))
         for i in range(1, items):
-            for j in range(size):
+            for j in range(size, 0, -1):
                 if j >= weights[i]:
                     cache[(i, j)] = max(
                         cache[(i-1, j)],
