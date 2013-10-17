@@ -29,7 +29,7 @@ def main():
     sys.setrecursionlimit(20000)
 
     if sys.argv[-1] == '2':
-        with open('knapsack1.txt', 'rt') as f:
+        with open('knapsack_big.txt', 'rt') as f:
             size = None
             values = []
             weights = []
