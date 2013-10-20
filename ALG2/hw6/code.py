@@ -21,15 +21,46 @@ class Graph(object):
             self.nodes[id] = node
         return node
 
-    def add_data(self, origin, distination):
-        o = self.get_node(-origin)
-        d = self.get_node(distination)
-        o.set_out(d.id)
-        d.set_in(o.id)
-        o = self.get_node(origin)
-        d = self.get_node(-distination)
-        o.set_out(d.id)
-        d.set_in(o.id)
+    def add_data(self, u, v):
+        N = self.size
+        if u > 0:
+            if v > 0:
+                o = self.get_node(N+u)
+                d = self.get_node(v)
+                o.set_out(d.id)
+                d.set_in(o.id)
+                o = self.get_node(N+v)
+                d = self.get_node(u)
+                o.set_out(d.id)
+                d.set_in(o.id)
+            else:
+                o = self.get_node(N+u)
+                d = self.get_node(N-v)
+                o.set_out(d.id)
+                d.set_in(o.id)
+                o = self.get_node(-v)
+                d = self.get_node(u)
+                o.set_out(d.id)
+                d.set_in(o.id)
+        else:
+            if v > 0:
+                o = self.get_node(-u)
+                d = self.get_node(v)
+                o.set_out(d.id)
+                d.set_in(o.id)
+                o = self.get_node(N+v)
+                d = self.get_node(N-u)
+                o.set_out(d.id)
+                d.set_in(o.id)
+            else:
+                o = self.get_node(-u)
+                d = self.get_node(N-v)
+                o.set_out(d.id)
+                d.set_in(o.id)
+                o = self.get_node(-v)
+                d = self.get_node(N-u)
+                o.set_out(d.id)
+                d.set_in(o.id)
 
     def calc_finish(self):
         print('First pass')
@@ -62,9 +93,13 @@ class Graph(object):
                 n = self.get_node(n)
                 if n.fwd:
                     continue
-                scc.add(n.id)
-                if -n.id in scc:
+                if n.id > self.size and (n.id - self.size) in scc:
+                    print(scc)
                     raise ValueError('unsatisfied')
+                elif n.id < self.size and (n.id + self.size) in scc:
+                    print(scc)
+                    raise ValueError('unsatisfied')
+                scc.add(n.id)
                 self.dfs(n, queue, fw, scc)
         else:
             node.bck = True
@@ -78,6 +113,7 @@ class Graph(object):
 class Node(object):
 
     def __init__(self, id):
+        assert id > 0
         self.id = id
         self.finish = None
         self.incoming = set()
