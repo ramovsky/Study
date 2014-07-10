@@ -1,3 +1,6 @@
 [submodule "PYA"]
 	path = PYA
 	url = git@github.com:ramovsky/advanced-01.git
+[submodule "DTSCI/hw"]
+	path = DTSCI/hw
+	url = git@github.com:ramovsky/datasci_course_materials.git
