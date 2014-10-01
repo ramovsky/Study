@@ -18,6 +18,7 @@ def factorial(n):
 
 factorial = math.factorial
 
+
 def combinations(p, r):
     assert p > r
     return factorial(p)/factorial(r)/factorial(p-r)
@@ -30,21 +31,22 @@ class Lottery:
         for r in rules:
             name, rule = r.split(':')
             lst.append((self._get_rule_score(rule), name))
-        print(sorted(lst))
         return tuple(n for s, n in sorted(lst))
 
     def _get_rule_score(self, rule):
         choices, blanks, sorte, unique = rule.strip().split()
         choices, blanks = map(int, (choices, blanks))
         base = combinations(choices, blanks)
+        p, r = choices, blanks
+
         if sorte == 'T' and unique == 'T':
             return base
 
         if sorte == 'T'and unique == 'F':
-            return base + choices
+            return factorial(p+r-1)/factorial(p-1)/factorial(r)
 
         if sorte == 'F' and unique == 'T':
-            return choices ** blanks - choices
+            return factorial(p)/factorial(p-r)
 
         if sorte == 'F'  and unique == 'F':
             return choices ** blanks
