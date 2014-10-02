@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>TopCoder SRM 144 - 550: BinaryCode</title>
+    <title>TopCoder SRM 144 - 1100: PowerOutage</title>
     
     <link type="image/x-icon" rel="shortcut icon" href="http://www.topcoder.com/i/favicon.ico"/>
     
@@ -215,8 +215,8 @@ li.testcase .data {
     <h1 class="heading">
         <span id='contest-name'>SRM 144</span>
         <span id='contest-division'>2</span>
-        <span id='problem-score'>550</span>
-        <span id='problem-name'>BinaryCode</span>
+        <span id='problem-score'>1100</span>
+        <span id='problem-name'>PowerOutage</span>
     </h1>
 
     <hr />
@@ -225,35 +225,8 @@ li.testcase .data {
     <div class="section">
         <h2 class="section-title">Problem Statement</h2>
         <div class="problem-intro">
-            <intro escaped="1"><p>Let's say you have a binary string such as the following:</p>
-
-<p><tt>011100011</tt></p>
-
-<p>One way to encrypt this string is to add to each digit the sum of its adjacent digits.  For example, the above string would become:</p>
-
-<p><tt>123210122</tt></p>
-
-<p>In particular, if <tt>P</tt> is the original string, and <tt>Q</tt> is the encrypted string, then <tt>Q[i] = P[i-1] + P[i] + P[i+1]</tt> for all digit positions <tt>i</tt>.  Characters off the left and right edges of the string are treated as zeroes.</p>
-
-<p>An encrypted string given to you in this format can be decoded as follows (using <tt>123210122</tt> as an example):
-
-<ol><li>Assume <tt>P[0] = 0</tt>.</li>
-<li>Because <tt>Q[0] = P[0] + P[1] = 0 + P[1] = 1</tt>, we know that <tt>P[1] = 1</tt>.</li>
-<li>Because <tt>Q[1] = P[0] + P[1] + P[2] = 0 + 1 + P[2] = 2</tt>, we know that <tt>P[2] = 1</tt>.</li>
-<li>Because <tt>Q[2] = P[1] + P[2] + P[3] = 1 + 1 + P[3] = 3</tt>, we know that <tt>P[3] = 1</tt>.</li>
-<li>Repeating these steps gives us <tt>P[4] = 0</tt>, <tt>P[5] = 0</tt>, <tt>P[6] = 0</tt>, <tt>P[7] = 1</tt>, and <tt>P[8] = 1</tt>.</li>
-<li>We check our work by noting that <tt>Q[8] = P[7] + P[8] = 1 + 1 = 2</tt>.  Since this equation works out, we are finished, and we have recovered one possible original string.</li></ol></p>
-
-<p>Now we repeat the process, assuming the opposite about <tt>P[0]</tt>:
-
-<ol><li>Assume <tt>P[0] = 1</tt>.</li>
-<li>Because <tt>Q[0] = P[0] + P[1] = 1 + P[1] = 1</tt>, we know that <tt>P[1] = 0</tt>.</li>
-<li>Because <tt>Q[1] = P[0] + P[1] + P[2] = 1 + 0 + P[2] = 2</tt>, we know that <tt>P[2] = 1</tt>.</li>
-<li>Now note that <tt>Q[2] = P[1] + P[2] + P[3] = 0 + 1 + P[3] = 3</tt>, which leads us to the conclusion that <tt>P[3] = 2</tt>.  However, this violates the fact that each character in the original string must be '0' or '1'.  Therefore, there exists no such original string <tt>P</tt> where the first digit is '1'.</li></ol></p>
-
-<p>Note that this algorithm produces at most two decodings for any given encrypted string.  There can never be more than one possible way to decode a string once the first binary digit is set.</p>
-
-<p>Given a <type>String</type> <b>message</b>, containing the encrypted string, return a <type>String[]</type> with exactly two elements.  The first element should contain the decrypted string assuming the first character is '0'; the second element should assume the first character is '1'.  If one of the tests fails, return the string &quot;NONE&quot; in its place.  For the above example, you should return <tt>{&quot;011100011&quot;, &quot;NONE&quot;}</tt>.</p></intro>
+            <intro><p>You work for an electric company, and the power goes out in a rather large apartment complex with a lot of irate tenants. You isolate the problem to a network of sewers underneath the complex with a step-up transformer at every junction in the maze of ducts. Before the power can be restored, every transformer must be checked for proper operation and fixed if necessary. To make things worse, the sewer ducts are arranged as a tree with the root of the tree at the entrance to the network of sewers. This means that in order to get from one transformer to the next, there will be a lot of backtracking through the long and claustrophobic ducts because there are no shortcuts between junctions. Furthermore, it's a Sunday; you only have one available technician on duty to search the sewer network for the bad transformers. Your supervisor wants to know how quickly you can get the power back on; he's so impatient that he wants the power back on the moment the technician okays the last transformer, without even waiting for the technician to exit the sewers first.</p>
+<p> You will be given three <type>int[]</type>'s: <b><tt>fromJunction</tt></b>, <b><tt>toJunction</tt></b>, and <b><tt>ductLength</tt></b> that represents each sewer duct. Duct i starts at junction (<b><tt>fromJunction[i]</tt></b>) and leads to junction (<b><tt>toJunction[i]</tt></b>). <b><tt>ductlength[i]</tt></b> represents the amount of minutes it takes for the technician to traverse the duct connecting <b><tt>fromJunction[i]</tt></b> and <b><tt>toJunction[i]</tt></b>. Consider the amount of time it takes for your technician to check/repair the transformer to be instantaneous. Your technician will start at junction 0 which is the root of the sewer system. Your goal is to calculate the minimum number of minutes it will take for your technician to check all of the transformers. You will return an <type>int</type> that represents this minimum number of minutes.</p></intro>
         </div>
     </div>
     
@@ -265,30 +238,34 @@ li.testcase .data {
             <ul class="problem-definition-lines">
                 <li class="definition-line" id='class-line'>
                     <span class='definition-name'>Class</span>
-                    <span class='definition-value'>BinaryCode</span>
+                    <span class='definition-value'>PowerOutage</span>
                 </li>
                 <li class="definition-line" id='method-line'>
                     <span class='definition-name'>Method</span>
-                    <span class='definition-value'>decode</span>
+                    <span class='definition-value'>estimateTimeOut</span>
                 </li>
                 <li class="definition-line" id='parameters-line'>
                     <span class='definition-name'>Parameters</span>
                     <span class='definition-value'>
                     
-                        string
+                        tuple(integer)
+                    , 
+                        tuple(integer)
+                    , 
+                        tuple(integer)
                     
                     </span>
                 </li>
                 <li class="definition-line" id='returns-line'>
                     <span class='definition-name'>Returns</span>
                     <span class='definition-value'>
-                        tuple(string)
+                        integer
                     </span>
                 </li>
                 <li class="definition-line" id='signature-line'>
                     <span class='definition-name'>Method signature</span>
                     <span class='definition-value'>
-                        def decode(self, message)
+                        def estimateTimeOut(self, fromJunction, toJunction, ductLength)
                     </span>
                 </li>
             </ul>
@@ -321,9 +298,25 @@ li.testcase .data {
         <h2 class="section-title">Constraints</h2>
         <ul class="constraints">
         
-            <li><user-constraint escaped="1"><b>message</b> will contain between 1 and 50 characters, inclusive.</user-constraint></li>
+            <li><user-constraint><b><tt>fromJunction</tt></b> will contain between 1 and 50 elements, inclusive.</user-constraint></li>
         
-            <li><user-constraint escaped="1">Each character in <b>message</b> will be either '0', '1', '2', or '3'.</user-constraint></li>
+            <li><user-constraint><b><tt>toJunction</tt></b> will contain between 1 and 50 elements, inclusive.</user-constraint></li>
+        
+            <li><user-constraint><b><tt>ductLength</tt></b> will contain between 1 and 50 elements, inclusive.</user-constraint></li>
+        
+            <li><user-constraint><b><tt>toJunction</tt></b>, <b><tt>fromJunction</tt></b>, and <b><tt>ductLength</tt></b> must all contain the same number of elements.</user-constraint></li>
+        
+            <li><user-constraint>Every element of <b><tt>fromJunction</tt></b> will be between 0 and 49 inclusive.</user-constraint></li>
+        
+            <li><user-constraint>Every element of <b><tt>toJunction</tt></b> will be between 1 and 49 inclusive.</user-constraint></li>
+        
+            <li><user-constraint><b><tt>fromJunction[i]</tt></b> will be less than <b><tt>toJunction[i]</tt></b> for all valid values of i.</user-constraint></li>
+        
+            <li><user-constraint>Every (<b><tt>fromJunction[i]</tt></b>,<b><tt>toJunction[i]</tt></b>) pair will be unique for all valid values of i.</user-constraint></li>
+        
+            <li><user-constraint>Every element of <b><tt>ductlength</tt></b> will be between 1 and 2000000 inclusive.</user-constraint></li>
+        
+            <li><user-constraint>The graph represented by the set of edges (<b><tt>fromJunction[i]</tt></b>,<b><tt>toJunction[i]</tt></b>) will never contain a loop, and all junctions can be reached from junction 0.</user-constraint></li>
         
         </ul>
     </div>
@@ -340,10 +333,28 @@ li.testcase .data {
                         <ul class="variables">
                         
                             <li class="variable data">
-                                <span class="name data">message</span>
+                                <span class="name data">fromJunction</span>
                                 <span class="value data">
                                 
-                                    &quot;123210122&quot;
+                                    { 0 }
+                                
+                                </span>
+                            </li>
+                        
+                            <li class="variable data">
+                                <span class="name data">toJunction</span>
+                                <span class="value data">
+                                
+                                    { 1 }
+                                
+                                </span>
+                            </li>
+                        
+                            <li class="variable data">
+                                <span class="name data">ductLength</span>
+                                <span class="value data">
+                                
+                                    { 10 }
                                 
                                 </span>
                             </li>
@@ -355,14 +366,14 @@ li.testcase .data {
                         <span class="prefix data">Returns</span>
                         <span class="value data">
                         
-                            { &quot;011100011&quot;, &quot;NONE&quot; }
+                            10
                         
                         </span>
                     </div>
                     
                     <div class="testcase-annotation">
                         <div class='tag'>note</div>
-                        <div class="testcase-comment"><p>The example from above.</p></div>
+                        <div class="testcase-comment">The simplest sewer system possible. Your technician would first check transformer 0, travel to junction 1 and check transformer 1, completing his check. This will take 10 minutes.</div>
                     </div>
                     
                
@@ -376,10 +387,28 @@ li.testcase .data {
                         <ul class="variables">
                         
                             <li class="variable data">
-                                <span class="name data">message</span>
+                                <span class="name data">fromJunction</span>
                                 <span class="value data">
                                 
-                                    &quot;11&quot;
+                                    { 0, 1, 0 }
+                                
+                                </span>
+                            </li>
+                        
+                            <li class="variable data">
+                                <span class="name data">toJunction</span>
+                                <span class="value data">
+                                
+                                    { 1, 2, 3 }
+                                
+                                </span>
+                            </li>
+                        
+                            <li class="variable data">
+                                <span class="name data">ductLength</span>
+                                <span class="value data">
+                                
+                                    { 10, 10, 10 }
                                 
                                 </span>
                             </li>
@@ -391,14 +420,14 @@ li.testcase .data {
                         <span class="prefix data">Returns</span>
                         <span class="value data">
                         
-                            {&quot;01&quot;,<br />&nbsp;&quot;10&quot;}
+                            40
                         
                         </span>
                     </div>
                     
                     <div class="testcase-annotation">
                         <div class='tag'>note</div>
-                        <div class="testcase-comment"><p>We know that one of the digits must be '1', and the other must be '0'.  We return both cases.</p></div>
+                        <div class="testcase-comment">Starting at junction 0, if the technician travels to junction 3 first, then backtracks to 0 and travels to junction 1 and then junction 2, all four transformers can be checked in 40 minutes, which is the minimum.</div>
                     </div>
                     
                
@@ -412,10 +441,28 @@ li.testcase .data {
                         <ul class="variables">
                         
                             <li class="variable data">
-                                <span class="name data">message</span>
+                                <span class="name data">fromJunction</span>
                                 <span class="value data">
                                 
-                                    &quot;22111&quot;
+                                    { 0, 0, 0, 1, 4 }
+                                
+                                </span>
+                            </li>
+                        
+                            <li class="variable data">
+                                <span class="name data">toJunction</span>
+                                <span class="value data">
+                                
+                                    { 1, 3, 4, 2, 5 }
+                                
+                                </span>
+                            </li>
+                        
+                            <li class="variable data">
+                                <span class="name data">ductLength</span>
+                                <span class="value data">
+                                
+                                    { 10, 10, 100, 10, 5 }
                                 
                                 </span>
                             </li>
@@ -427,14 +474,14 @@ li.testcase .data {
                         <span class="prefix data">Returns</span>
                         <span class="value data">
                         
-                            { &quot;NONE&quot;, &quot;11001&quot; }
+                            165
                         
                         </span>
                     </div>
                     
                     <div class="testcase-annotation">
                         <div class='tag'>note</div>
-                        <div class="testcase-comment"><p>Since the first digit of the encrypted string is '2', the first two digits of the original string must be '1'.  Our test fails when we try to assume that <tt>P[0] = 0</tt>.</p></div>
+                        <div class="testcase-comment">Traveling in the order 0-1-2-1-0-3-0-4-5 results in a time of 165 minutes which is the minimum.</div>
                     </div>
                     
                
@@ -448,10 +495,28 @@ li.testcase .data {
                         <ul class="variables">
                         
                             <li class="variable data">
-                                <span class="name data">message</span>
+                                <span class="name data">fromJunction</span>
                                 <span class="value data">
                                 
-                                    &quot;123210120&quot;
+                                    { 0, 0, 0, 1, 4, 4, 6, 7, 7, 7, 20 }
+                                
+                                </span>
+                            </li>
+                        
+                            <li class="variable data">
+                                <span class="name data">toJunction</span>
+                                <span class="value data">
+                                
+                                    { 1, 3, 4, 2, 5, 6, 7, 20, 9, 10, 31 }
+                                
+                                </span>
+                            </li>
+                        
+                            <li class="variable data">
+                                <span class="name data">ductLength</span>
+                                <span class="value data">
+                                
+                                    { 10, 10, 100, 10, 5, 1, 1, 100, 1, 1, 5 }
                                 
                                 </span>
                             </li>
@@ -463,14 +528,14 @@ li.testcase .data {
                         <span class="prefix data">Returns</span>
                         <span class="value data">
                         
-                            {&quot;NONE&quot;,<br />&nbsp;&quot;NONE&quot;}
+                            281
                         
                         </span>
                     </div>
                     
                     <div class="testcase-annotation">
                         <div class='tag'>note</div>
-                        <div class="testcase-comment"><p>This is the same as the first example, but the rightmost digit has been changed to something inconsistent with the rest of the original string.  No solutions are possible.</p></div>
+                        <div class="testcase-comment">Visiting junctions in the order 0-3-0-1-2-1-0-4-5-4-6-7-9-7-10-7-8-11 is optimal, which takes  (10+10+10+10+10+10+100+5+5+1+1+1+1+1+1+100+5) or 281 minutes.</div>
                     </div>
                     
                
@@ -484,41 +549,28 @@ li.testcase .data {
                         <ul class="variables">
                         
                             <li class="variable data">
-                                <span class="name data">message</span>
+                                <span class="name data">fromJunction</span>
                                 <span class="value data">
                                 
-                                    &quot;3&quot;
+                                    { 0, 0, 0, 0, 0 }
                                 
                                 </span>
                             </li>
-                        
-                        </ul>
-                    </div>
-                    <div class="testcase-output">
-                        <div class='tag'>output</div>
-                        <span class="prefix data">Returns</span>
-                        <span class="value data">
-                        
-                            {&quot;NONE&quot;,<br />&nbsp;&quot;NONE&quot;}
-                        
-                        </span>
-                    </div>
-                    
-               
-                </div>
-            </li>
-            
-            <li class="testcase">
-                <div class="testcase-content">
-                    <div class="testcase-input">
-                        <div class='tag'>input</div>
-                        <ul class="variables">
                         
                             <li class="variable data">
-                                <span class="name data">message</span>
+                                <span class="name data">toJunction</span>
                                 <span class="value data">
                                 
-                                    &quot;12221112222221112221111111112221111&quot;
+                                    { 1, 2, 3, 4, 5 }
+                                
+                                </span>
+                            </li>
+                        
+                            <li class="variable data">
+                                <span class="name data">ductLength</span>
+                                <span class="value data">
+                                
+                                    { 100, 200, 300, 400, 500 }
                                 
                                 </span>
                             </li>
@@ -530,7 +582,7 @@ li.testcase .data {
                         <span class="prefix data">Returns</span>
                         <span class="value data">
                         
-                            {&quot;01101001101101001101001001001101001&quot;,<br />&nbsp;&quot;10110010110110010110010010010110010&quot;}
+                            2500
                         
                         </span>
                     </div>
