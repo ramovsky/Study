@@ -1,44 +1,87 @@
 # -*- coding: utf-8 -*-
 import math,string,itertools,fractions,heapq,collections,re,array,bisect
+from collections import defaultdict
+from functools import total_ordering
+from heapq import heappop, heappush, heapify
+
 
 INF = float('inf')
+
+
+@total_ordering
+class Node:
+
+    edges = {}
+    score = INF
+
+    def __init__(self, id):
+        self.id = id
+
+    def add_edge(self, id, length):
+        self.edges[id] = length
+
+    def update_score(self, score):
+        self.score = min(self.score, score)
+
+    def __lt__(self, other):
+        return self.score < other.score
+
+    def __eq__(self, other):
+        return self.score == other.score
+
+    def __repr__(self):
+        return '<Node. score:{} edges:{}>'.format(
+            self.score, [e for e in self.edges])
+
+
+class Tree(dict):
+
+    def __init__(self, start, end, length):
+        self._cache = {}
+        self._leaves = set(end)
+        for i, o, l in zip(start, end, length):
+            self.get_node(o)
+            node = self.get_node(i)
+            node.add_edge(o, l)
+            self._leaves.discard(i)
+
+    def get_node(self, id):
+        node = self.get(id)
+        if node is None:
+            node = Node(id)
+            self[id] = node
+        return node
+
+    def dijkstra(self, source, dest):
+        visited = set()
+        qset = set([source])
+        source = self.get_node(source)
+        source.score = 0
+        queue = [source]
+        while queue:
+            node = heappop(queue)
+            visited.add(node.id)
+            qset.discard(node.id)
+            for id, l in node.edges.items():
+                if id in visited:
+                    continue
+                if id in qset:
+                    queue.remove(self[id])
+                qset.add(id)
+                self[id].update_score(node.score + l)
+                heappush(queue, self[id])
+
+        ret = self[dest].score
+        for n in self.values():
+            n.score = INF
+        return ret
 
 
 class PowerOutage:
 
     def estimateTimeOut(self, fromJunction, toJunction, ductLength):
-        size = len(fromJunction)
-        edges = {}
-        for i, o, l in zip(fromJunction, toJunction, ductLength):
-            edges[(i, o)] = l
-        prev = {}
-        work = {}
-        shortest = INF
-        ret = 0
-
-        for i in range(1, size+1):
-            for j in range(1, size+1):
-                key = (i, j)
-                if i == j:
-                    prev[key] = 0
-                elif key in edges:
-                    prev[key] = edges[key]
-                else:
-                    prev[key] = INF
-
-        for k in range(1, size+1):
-            for i in range(1, size+1):
-                for j in range(1, size+1):
-                    key = (i, j)
-                    v = min(
-                        prev[key],
-                        prev[(i, k)] + prev[(k, j)]
-                        )
-                    work[key] = v
-            prev = work.copy()
-            work = {}
-
-        print(prev)
+        tree = Tree(fromJunction, toJunction, ductLength)
+        ret = tree.dijkstra(0, tree._leaves.pop())
 
         return ret
 
