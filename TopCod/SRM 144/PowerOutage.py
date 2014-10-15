@@ -11,11 +11,11 @@ INF = float('inf')
 @total_ordering
 class Node:
 
-    edges = {}
     score = INF
 
     def __init__(self, id):
         self.id = id
+        self.edges = {}
 
     def add_edge(self, id, length):
         self.edges[id] = length
@@ -30,20 +30,21 @@ class Node:
         return self.score == other.score
 
     def __repr__(self):
-        return '<Node. score:{} edges:{}>'.format(
-            self.score, [e for e in self.edges])
+        return '<Node {}. sc:{} ed:{}>'.format(
+            self.id, self.score, self.edges)
 
 
 class Tree(dict):
 
     def __init__(self, start, end, length):
         self._cache = {}
-        self._leaves = set(end)
+        self.leaves = set(end)
         for i, o, l in zip(start, end, length):
-            self.get_node(o)
-            node = self.get_node(i)
-            node.add_edge(o, l)
-            self._leaves.discard(i)
+            dst = self.get_node(o)
+            dst.add_edge(i, l)
+            src = self.get_node(i)
+            src.add_edge(o, l)
+            self.leaves.discard(i)
 
     def get_node(self, id):
         node = self.get(id)
@@ -53,27 +54,35 @@ class Tree(dict):
         return node
 
     def dijkstra(self, source, dest):
-        visited = set()
-        qset = set([source])
-        source = self.get_node(source)
-        source.score = 0
-        queue = [source]
-        while queue:
-            node = heappop(queue)
-            visited.add(node.id)
-            qset.discard(node.id)
-            for id, l in node.edges.items():
-                if id in visited:
-                    continue
-                if id in qset:
-                    queue.remove(self[id])
-                qset.add(id)
-                self[id].update_score(node.score + l)
-                heappush(queue, self[id])
+        key = tuple(sorted([source, dest]))
+        ret = self._cache.get(key)
+        if ret is None:
+            visited = set()
+            qset = set([source])
+            source = self.get_node(source)
+            source.score = 0
+            queue = [source]
+            while queue:
+                node = heappop(queue)
+                visited.add(node.id)
+                qset.discard(node.id)
+                for id, l in node.edges.items():
+                    if id in visited:
+                        continue
+                    if id in qset:
+                        queue.remove(self[id])
+                    qset.add(id)
+                    self[id].update_score(node.score + l)
+                    heappush(queue, self[id])
 
-        ret = self[dest].score
-        for n in self.values():
-            n.score = INF
+            ret = self[dest].score
+            for n in self.values():
+                n.score = INF
+
+            self._cache[key] = ret
+        else:
+            print('HIT!')
+
         return ret
 
 
@@ -81,7 +90,20 @@ class PowerOutage:
 
     def estimateTimeOut(self, fromJunction, toJunction, ductLength):
         tree = Tree(fromJunction, toJunction, ductLength)
-        ret = tree.dijkstra(0, tree._leaves.pop())
+        cur = 0
+        ret = 0
+        left = set(tree.leaves)
+        while left:
+            closest = None, INF
+            for leaf in left:
+                dist = tree.dijkstra(cur, leaf)
+                if dist < closest[1]:
+                    closest = leaf, dist
+
+            cur, dist = closest
+            ret += dist
+            print(cur, ret)
+            left.discard(cur)
 
         return ret
 
