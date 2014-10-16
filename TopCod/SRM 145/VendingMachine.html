@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>TopCoder SRM 145 - 600: VendingMachine</title>
+    
+    <link type="image/x-icon" rel="shortcut icon" href="http://www.topcoder.com/i/favicon.ico"/>
+    
+
+    
+    <style type="text/css">
+        /* font */
+body {
+    font-family: Helvetica, Arial, Verdana, sans-serif;
+    font-size: 16px;
+    line-height: 1.2em;
+}
+ul.constraints > li:before, ul.notes > li:before {
+    font-family: monospace;
+    font-weight: normal;
+}
+.heading {
+    font-weight: bold;
+    font-size: 175%;
+    line-height: 1.2em;
+}
+.section .section-title {
+    font-weight: bold;
+    font-size: 125%;
+}
+ol.testcases > li:before {
+    font-family: monospace;
+}
+type {
+    font-weight: bold;
+    font-family: monospace;
+}
+li.testcase .data {
+    font-family: monospace;
+    line-height: 1.5em;
+}
+
+/* layout */
+.heading {
+    margin-top: 0.1em;
+    margin-bottom:0.1em;
+    text-align: center;
+}
+.section .section-title {
+    margin-top : 1em;
+    margin-bottom: 1em;
+}
+.problem-intro, note, user-constraint {
+    padding-left: 1.25em;
+}
+
+/* Lists */
+ul.constraints, ul.notes, ul.variables, ul.problem-definition-lines {
+    list-style-type: none;
+    padding: 0px;
+}
+ul.constraints > li:before {
+    content: "-";
+    position:relative;
+    margin-left: 0px; /* optional, for multiline li element */
+    left: 0.625em;
+}
+ul.notes > li:before {
+    content: "-";
+    position:relative;
+    margin-left: 0px; /* optional, for multiline li element */
+    left: 0.625em;
+}
+
+/* Testcases */
+li.testcase {
+    line-height: 1.1em;
+    padding-top: 0.625em;
+    padding-bottom: 0.625em;
+    overflow: auto;
+}
+li.testcase > .testcase-content > div { padding-bottom: 0.5em; padding-left: 1em; }
+
+li.testcase .testcase-comment {
+    margin: 0;
+    padding-left: 1em;
+}
+.testcase-comment p:first-child { margin-top: 0; }
+.testcase-comment p:last-child { margin-bottom: 0; }
+
+li.testcase .testcase-content {
+    margin: 0.31em;
+}
+
+/* Data and variables */
+.testcase-output {
+    padding: 0.2em 1em 0.2em 0em;
+}
+.variables, .testcase-output {
+    margin-left: 0.5em;
+    display: table;
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+.variable {
+    display: table-row;
+}
+.variable .name {
+    padding: 0.2em 0em 0.2em 1em;
+    font-weight: bold;
+    display: table-cell;
+    text-align: right;
+}
+.testcase-output .prefix {
+    padding: 0.2em 0em 0.2em 1em;
+    display: table-cell;
+}
+.testcase-output .prefix:after {
+    content : ":";
+    padding-right: 0.5em;
+}
+.variable .name:after {
+    font-weight: bold;
+    content : ":";
+    padding-right: 0.5em;
+}
+.variable .value, .testcase-output .value {
+    padding: 0.2em 1em 0.2em 0em;
+    display: table-cell;
+}
+ol.testcases {
+    padding: 0px;
+    counter-reset: test_number -1;
+}
+ol.testcases > li {
+    list-style:none;
+}
+ol.testcases > li:before {
+    counter-increment:test_number;
+    display: block;
+    clear: both;
+    content:counter(test_number) ")";
+    color: inherit;
+    background: inherit;
+}
+
+/* Problem Definition */
+.problem-definition, .problem-limits {
+    padding-left: 1.25em;
+}
+.problem-definition-lines, .limit-lines {
+    display: table;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-left: 0px;
+}
+.definition-line, .limit-line {
+    display: table-row;
+    height: 1.5em;
+    overflow: auto;
+}
+.limit-name:after {
+    content: ":";
+    margin-right: 1em;
+}
+.definition-name, .definition-value, .limit-name, .limit-value {
+    display: table-cell;
+}
+.definition-value {
+    padding-left: 0.5em;
+}
+.definition-name:after {
+    content: ":";
+}
+#contest-division:before {
+    content: "Div ";
+}
+#problem-score:before {
+    content: "- Problem ";
+}
+#problem-name {
+    display: block;
+}
+
+/* Tags, hidden default */
+.tag {
+    visibility: hidden;
+    position: absolute;
+}
+
+        body {
+    /* font color */
+    color: #333333;
+    /* background color */
+    background-color: white;
+}
+.section .section-title {
+    /* title color */
+    color: black;
+}
+li.testcase .data {
+    /* highlight color */
+    background: #eee;
+}
+
+    </style>
+    
+    
+    
+
+</head>
+
+<body>
+    <h1 class="heading">
+        <span id='contest-name'>SRM 145</span>
+        <span id='contest-division'>1</span>
+        <span id='problem-score'>600</span>
+        <span id='problem-name'>VendingMachine</span>
+    </h1>
+
+    <hr />
+
+    <!-- Problem Statement -->
+    <div class="section">
+        <h2 class="section-title">Problem Statement</h2>
+        <div class="problem-intro">
+            <intro><p>
+<i>Note that in the following problem statement, all quotes and angle brackets are for clarity</i>
+</p>
+
+<p>
+A certain vending machine delves out its goods from a rotating cylinder, which can rotate around in both clockwise and counter-clockwise directions.  The cylinder has a number of shelves on it, and each shelf is divided into a number of columns.  On the front of the machine, there is a panel of doors that extends the entire height of the column.  There is one door for each shelf, which is the width of one column.  When a purchase is made, the user uses two buttons to rotate the cylinder so their purchase is located at a door.  They make their purchase by sliding the appropriate door open, and removing the item (there can only be one item per column on a particular shelf).  The cylinder can rotate in a complete circle, and so there are always two ways to get from a particular column to another column.
+</p>
+
+<p>
+Because the vending machine company wants to sell the most expensive items possible, and the machine can only show one column at a time, the machine will always try to put forth the most expensive column available.  The price of a column is calculated by adding up all the prices of the remaining items in that column.  The most expensive column is defined to be the one with the maximum price.  If 5 minutes have elapsed since the last purchase was made, the machine rotates the cylinder to the most expensive column.  If, however, another purchase has been made before the 5 minutes are up, the rotation does not occur, and the 5 minute timer is reset.
+</p>
+
+<p>
+Recently, some machines' rotating motors have been failing early, and the company wants to see if it is because the machines rotate to show their expensive column too often.  To determine this, they have hired you to simulate purchases and see how long the motor is running.
+</p>
+
+<p>
+You will be given the <b>prices</b> of all the items in the vending machine in a <type>String[]</type>.  Each element of <b>prices</b> will be a single-space separated list of integers, which are the prices (in cents) of the items.  The Nth integer in the Mth element of <b>prices</b> represents the price of the Nth column in the Mth shelf in the cylinder.  You will also be given a <type>String[]</type> <b>purchases</b>.  Each element in <b>purchases</b> will be in the format:<br /> <tt>&quot;&lt;shelf&gt;,&lt;column&gt;:&lt;time&gt;&quot;</tt><br />
+&lt;shelf&gt; is a 0-based integer which identifies the shelf that the item was purchased from.  &lt;column&gt; is a 0-based integer which identifies the column the item was purchased from.  &lt;time&gt; is an integer which represents the time, in minutes, since the machine was turned on.
+</p>
+
+<p>
+In the simulation, the motor needs to run for 1 second in order to rotate to an adjacent column.  When the machine is turned on, column 0 is facing out, and it immediately rotates to the most expensive column, even if the first purchase is at time 0.  The machine also rotates to the most expensive column at the end of the simulation, after the last purchase.  Note that when an item is purchased, its price is no longer used in calculating the price of the column it is in.  When the machine rotates to the most expensive column, or when a user rotates the cylinder, the rotation is in the direction which takes the least amount of time.  For example, in a 4-column cylinder, if column 0 is displayed, and the cylinder is rotated to column 3, it can be rotated backwards, which takes 1 second, versus rotating forwards which takes 3 seconds.
+</p>
+
+<p>
+If a user tries to purchase an item that was already purchased, this is an incorrect simulation, and your method should return -1.  Otherwise, your method should return how long the motor was running, in seconds.
+</p>
+</intro>
+        </div>
+    </div>
+    
+    <!-- Problem definition -->
+    
+    <div class="section" id="definition">
+        <h2 class="section-title">Definition</h2>
+        <div class="problem-definition">
+            <ul class="problem-definition-lines">
+                <li class="definition-line" id='class-line'>
+                    <span class='definition-name'>Class</span>
+                    <span class='definition-value'>VendingMachine</span>
+                </li>
+                <li class="definition-line" id='method-line'>
+                    <span class='definition-name'>Method</span>
+                    <span class='definition-value'>motorUse</span>
+                </li>
+                <li class="definition-line" id='parameters-line'>
+                    <span class='definition-name'>Parameters</span>
+                    <span class='definition-value'>
+                    
+                        tuple(string)
+                    , 
+                        tuple(string)
+                    
+                    </span>
+                </li>
+                <li class="definition-line" id='returns-line'>
+                    <span class='definition-name'>Returns</span>
+                    <span class='definition-value'>
+                        integer
+                    </span>
+                </li>
+                <li class="definition-line" id='signature-line'>
+                    <span class='definition-name'>Method signature</span>
+                    <span class='definition-value'>
+                        def motorUse(self, prices, purchases)
+                    </span>
+                </li>
+            </ul>
+            <div class="problem-definition-public-tip">(be sure your method is public)</div>
+        </div>        
+    </div>
+    
+
+    <!-- Limits -->
+    <div class="section">
+        <h2 class="section-title">Limits</h2>
+        <div class='problem-limits'>
+            <ul class="limit-lines">
+                <li class='limit-line'>
+                    <span class='limit-name'>Time limit (s)</span>
+                    <span class='limit-value'>2.000</span>
+                </li>
+                <li class='limit-line'>
+                    <span class='limit-name'>Memory limit (MB)</span>
+                    <span class='limit-value'>64</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    
+    <!-- Notes -->
+    <div class="section">
+        <h2 class="section-title">Notes</h2>
+        <ul class="notes">
+        
+            <li><note>When rotating to the most expensive column, if two columns have the same price, rotate to the one with the lowest column number (see example 0).</note></li>
+        
+            <li><note>If two purchases are less than 5 minutes apart, the machine does not perform a rotation to the most expensive column between the purchases.  If two purchases are 5 or more minutes apart, the machine rotates to the most expensive column between the two purchases.</note></li>
+        
+        </ul>
+    </div>
+    
+    
+    <!-- Constraints -->
+    <div class="section">
+        <h2 class="section-title">Constraints</h2>
+        <ul class="constraints">
+        
+            <li><user-constraint><b>prices</b> will have between 1 and 50 elements, inclusive.</user-constraint></li>
+        
+            <li><user-constraint>Each element of <b>prices</b> will have between 5 and 50 characters, is a single-space separated list of integers, and has no leading or trailing spaces.</user-constraint></li>
+        
+            <li><user-constraint>Each element of <b>prices</b> will have the same number of integers in it.</user-constraint></li>
+        
+            <li><user-constraint>Each element of <b>prices</b> will have at least 3 integers in it.</user-constraint></li>
+        
+            <li><user-constraint>Each integer in <b>prices</b> will be between 1 and 10000, inclusive, and will not contain leading 0's.</user-constraint></li>
+        
+            <li><user-constraint><b>purchases</b> will have between 1 and 50 elements, inclusive.</user-constraint></li>
+        
+            <li><user-constraint>Each element of <b>purchases</b> will be in the format <tt>&quot;&lt;shelf&gt;,&lt;column&gt;:&lt;time&gt;&quot;</tt> (angle brackets and quotes are for clarity only), where &lt;shelf&gt;, &lt;column&gt;, and &lt;time&gt; are all integers.</user-constraint></li>
+        
+            <li><user-constraint>In each element of <b>purchases</b>, &lt;shelf&gt; will be between 0 and M - 1, inclusive, where M is the number of elements in prices.</user-constraint></li>
+        
+            <li><user-constraint>In each element of <b>purchases</b>, &lt;column&gt; will be between 0 and N - 1, inclusive, where N is the number of integers in each element of prices.</user-constraint></li>
+        
+            <li><user-constraint>In each element of <b>purchases</b>, &lt;time&gt; will be between 0 and 1000, inclusive.</user-constraint></li>
+        
+            <li><user-constraint>In each element of <b>purchases</b>, &lt;shelf&gt;, &lt;column&gt;, and &lt;time&gt; will not contain extra leading 0's.</user-constraint></li>
+        
+            <li><user-constraint><b>purchases</b> will be sorted in strictly ascending order by &lt;time&gt;.  This means that each purchase must occur later than all previous ones.</user-constraint></li>
+        
+        </ul>
+    </div>
+
+    <!-- Test cases -->
+    <div class="section">
+        <h2 class="section-title">Test cases</h2>
+        <ol class="testcases" start='0'>
+            
+            <li class="testcase">
+                <div class="testcase-content">
+                    <div class="testcase-input">
+                        <div class='tag'>input</div>
+                        <ul class="variables">
+                        
+                            <li class="variable data">
+                                <span class="name data">prices</span>
+                                <span class="value data">
+                                
+                                    { &quot;100 100 100&quot; }
+                                
+                                </span>
+                            </li>
+                        
+                            <li class="variable data">
+                                <span class="name data">purchases</span>
+                                <span class="value data">
+                                
+                                    { &quot;0,0:0&quot;, &quot;0,2:5&quot;, &quot;0,1:10&quot; }
+                                
+                                </span>
+                            </li>
+                        
+                        </ul>
+                    </div>
+                    <div class="testcase-output">
+                        <div class='tag'>output</div>
+                        <span class="prefix data">Returns</span>
+                        <span class="value data">
+                        
+                            4
+                        
+                        </span>
+                    </div>
+                    
+                    <div class="testcase-annotation">
+                        <div class='tag'>note</div>
+                        <div class="testcase-comment"><p>
+The vending machine has three columns, and only one row.  Since all three items are the same price, they are all the most expensive, and therefore, the lowest numbered column is rotated to.  Since the machine starts out at column 0, no rotation is performed before the first purchase.  The starting configuration is (*'s denote the currently displayed column):
+</p>
+<pre> 
++-----+-----+-----+
+| 100 | 100 | 100 |
++*****+-----+-----+
+</pre>
+
+<p>
+In the first purchase, the customer does not rotate the cylinder because the item he wants is already displayed. The configuration of the vending machine is now:
+</p>
+<pre>
++-----+-----+-----+
+|  0  | 100 | 100 |
++*****+-----+-----+
+</pre>
+<p>
+Since the next purchase is at least 5 minutes away, the machine performs a rotation to the most expensive column.  Both column 1 and 2 are now 100 apiece, so it rotates to the smallest index of these, column 1.  The fastest way there is to rotate forward 1 column, yielding 1 second of motor use:
+</p>
+<pre>
++-----+-----+-----+
+|  0  | 100 | 100 |
++-----+*****+-----+
+</pre>
+
+<p>
+The next customer purchases the item in column 2, which is 1 column away, so add 1 second to the motor use.  Because another 5 minutes passes, the most expensive column is displayed, which is now column 1.  Add 1 more second for the rotation.  The configuration is now:
+</p>
+<pre>
++-----+-----+-----+
+|  0  | 100 |  0  |
++-----+*****+-----+
+</pre>
+
+<p>
+The final customer purchases from column 1, (which is already displayed), and the final most expensive column is rotated to.  Since all columns are the same price again (0), column 0 is displayed.  It takes 1 second to get back there, so add 1 more second.
+</p></div>
+                    </div>
+                    
+               
+                </div>
+            </li>
+            
+            <li class="testcase">
+                <div class="testcase-content">
+                    <div class="testcase-input">
+                        <div class='tag'>input</div>
+                        <ul class="variables">
+                        
+                            <li class="variable data">
+                                <span class="name data">prices</span>
+                                <span class="value data">
+                                
+                                    { &quot;100 200 300 400 500 600&quot; }
+                                
+                                </span>
+                            </li>
+                        
+                            <li class="variable data">
+                                <span class="name data">purchases</span>
+                                <span class="value data">
+                                
+                                    { &quot;0,2:0&quot;, &quot;0,3:5&quot;, &quot;0,1:10&quot;, &quot;0,4:15&quot; }
+                                
+                                </span>
+                            </li>
+                        
+                        </ul>
+                    </div>
+                    <div class="testcase-output">
+                        <div class='tag'>output</div>
+                        <span class="prefix data">Returns</span>
+                        <span class="value data">
+                        
+                            17
+                        
+                        </span>
+                    </div>
+                    
+                    <div class="testcase-annotation">
+                        <div class='tag'>note</div>
+                        <div class="testcase-comment"><p>
+The most expensive column during this whole example is column 5.  Since all purchases are at least 5 minutes apart, the most expensive column is rotated to each time.
+</p>
+
+<p>
+Before the purchases start, add 1 second for rotating to column 5.<br />
+The first purchase  is 3 columns away, so add 3 seconds to get there, and 3 seconds to get back to column 5<br />
+The second purchase is 2 columns away, so add 4 seconds to get there and back.<br />
+The third purchase is also 2 columns away, so add 4 more seconds.<br />
+The final purchase is only one column away, so add 2 more seconds.
+</p>
+
+<p>
+The final configuration is:
+</p>
+<pre>
++-----+-----+-----+-----+-----+-----+
+| 100 |  0  |  0  |  0  |  0  | 600 |
++-----+-----+-----+-----+-----+*****+
+</pre></div>
+                    </div>
+                    
+               
+                </div>
+            </li>
+            
+            <li class="testcase">
+                <div class="testcase-content">
+                    <div class="testcase-input">
+                        <div class='tag'>input</div>
+                        <ul class="variables">
+                        
+                            <li class="variable data">
+                                <span class="name data">prices</span>
+                                <span class="value data">
+                                
+                                    { &quot;100 200 300 400 500 600&quot; }
+                                
+                                </span>
+                            </li>
+                        
+                            <li class="variable data">
+                                <span class="name data">purchases</span>
+                                <span class="value data">
+                                
+                                    { &quot;0,2:0&quot;, &quot;0,3:4&quot;, &quot;0,1:8&quot;, &quot;0,4:12&quot; }
+                                
+                                </span>
+                            </li>
+                        
+                        </ul>
+                    </div>
+                    <div class="testcase-output">
+                        <div class='tag'>output</div>
+                        <span class="prefix data">Returns</span>
+                        <span class="value data">
+                        
+                            11
+                        
+                        </span>
+                    </div>
+                    
+                    <div class="testcase-annotation">
+                        <div class='tag'>note</div>
+                        <div class="testcase-comment"><p>
+This is the same as example 1, except now, the purchases are all less than 5 minutes apart.
+</p></div>
+                    </div>
+                    
+               
+                </div>
+            </li>
+            
+            <li class="testcase">
+                <div class="testcase-content">
+                    <div class="testcase-input">
+                        <div class='tag'>input</div>
+                        <ul class="variables">
+                        
+                            <li class="variable data">
+                                <span class="name data">prices</span>
+                                <span class="value data">
+                                
+                                    { &quot;100 100 100&quot; }
+                                
+                                </span>
+                            </li>
+                        
+                            <li class="variable data">
+                                <span class="name data">purchases</span>
+                                <span class="value data">
+                                
+                                    {&quot;0,0:10&quot;,<br />&nbsp;&quot;0,0:11&quot;}
+                                
+                                </span>
+                            </li>
+                        
+                        </ul>
+                    </div>
+                    <div class="testcase-output">
+                        <div class='tag'>output</div>
+                        <span class="prefix data">Returns</span>
+                        <span class="value data">
+                        
+                            -1
+                        
+                        </span>
+                    </div>
+                    
+                    <div class="testcase-annotation">
+                        <div class='tag'>note</div>
+                        <div class="testcase-comment"><p>
+The second purchase is illegal since the item was already purchased
+</p></div>
+                    </div>
+                    
+               
+                </div>
+            </li>
+            
+            <li class="testcase">
+                <div class="testcase-content">
+                    <div class="testcase-input">
+                        <div class='tag'>input</div>
+                        <ul class="variables">
+                        
+                            <li class="variable data">
+                                <span class="name data">prices</span>
+                                <span class="value data">
+                                
+                                    {&quot;100 200 300&quot;,<br />&nbsp;&quot;600 500 400&quot;}
+                                
+                                </span>
+                            </li>
+                        
+                            <li class="variable data">
+                                <span class="name data">purchases</span>
+                                <span class="value data">
+                                
+                                    { &quot;0,0:0&quot;, &quot;1,1:10&quot;, &quot;1,2:20&quot;, &quot;0,1:21&quot;, &quot;1,0:22&quot;, &quot;0,2:35&quot; }
+                                
+                                </span>
+                            </li>
+                        
+                        </ul>
+                    </div>
+                    <div class="testcase-output">
+                        <div class='tag'>output</div>
+                        <span class="prefix data">Returns</span>
+                        <span class="value data">
+                        
+                            6
+                        
+                        </span>
+                    </div>
+                    
+                    <div class="testcase-annotation">
+                        <div class='tag'>note</div>
+                        <div class="testcase-comment"><p>
+A two-row example.  The configurations just before each purchase are:
+</p>
+<pre>
+purchase 1:
++-----+-----+-----+
+| 100 | 200 | 300 |
++-----+-----+-----+
+| 600 | 500 | 400 |
++*****+-----+-----+
+
+purchase 2:
++-----+-----+-----+
+|  0  | 200 | 300 |
++-----+-----+-----+
+| 600 | 500 | 400 |
++-----+*****+-----+
+
+purchase 3:
++-----+-----+-----+
+|  0  | 200 | 300 |
++-----+-----+-----+
+| 600 |  0  | 400 |
++-----+-----+*****+
+
+purchase 4:
++-----+-----+-----+
+|  0  | 200 | 300 |
++-----+-----+-----+
+| 600 |  0  |  0  |
++-----+-----+*****+
+
+purchase 5:
++-----+-----+-----+
+|  0  |  0  | 300 |
++-----+-----+-----+
+| 600 |  0  |  0  |
++-----+*****+-----+
+
+purchase 6:
++-----+-----+-----+
+|  0  |  0  | 300 |
++-----+-----+-----+
+|  0  |  0  |  0  |
++-----+-----+*****+
+
+final:
++-----+-----+-----+
+|  0  |  0  |  0  |
++-----+-----+-----+
+|  0  |  0  |  0  |
++*****+-----+-----+
+</pre></div>
+                    </div>
+                    
+               
+                </div>
+            </li>
+            
+        </ol>
+    </div>
+    <hr />
+
+    This problem statement is the exclusive and proprietary property of TopCoder, Inc. Any unauthorized use or reproduction of this information without the prior written consent of TopCoder, Inc. is strictly prohibited. (c)2003, TopCoder, Inc. All rights reserved.
+</body>
+</html>
