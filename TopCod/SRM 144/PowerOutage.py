@@ -3,6 +3,7 @@ import math,string,itertools,fractions,heapq,collections,re,array,bisect
 from collections import defaultdict
 from functools import total_ordering
 from heapq import heappop, heappush, heapify
+from itertools import permutations
 
 
 INF = float('inf')
@@ -80,8 +81,6 @@ class Tree(dict):
                 n.score = INF
 
             self._cache[key] = ret
-        else:
-            print('HIT!')
 
         return ret
 
@@ -90,21 +89,15 @@ class PowerOutage:
 
     def estimateTimeOut(self, fromJunction, toJunction, ductLength):
         tree = Tree(fromJunction, toJunction, ductLength)
-        cur = 0
-        ret = 0
-        left = set(tree.leaves)
-        while left:
-            closest = None, INF
-            for leaf in left:
-                dist = tree.dijkstra(cur, leaf)
-                if dist < closest[1]:
-                    closest = leaf, dist
-
-            cur, dist = closest
-            ret += dist
-            print(cur, ret)
-            left.discard(cur)
-
+        ret = INF
+        for order in permutations(tree.leaves):
+            cur = 0
+            dist = 0
+            for leaf in order:
+                diff = tree.dijkstra(cur, leaf)
+                dist += diff
+                cur = leaf
+            ret = min(ret, dist)
         return ret
 
 # CUT begin
