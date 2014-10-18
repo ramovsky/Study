@@ -1,9 +1,89 @@
 # -*- coding: utf-8 -*-
 import math,string,itertools,fractions,heapq,collections,re,array,bisect
+from collections import defaultdict
+
+
+class State:
+
+    def __init__(self, prices):
+        self.steps = 0
+        self._cursor = 0
+        self._prices = defaultdict(list)
+        self._cells = [map(int, row.split()) for row in prices]
+        self._width = len(self._cells[0])
+        self.go_high()
+
+    def __repr__(self):
+        matrix = ''
+        for row in self._cells:
+            matrix += '\n' + ''.join('{:>5}'.format(e) for e in row)
+        return '<Machine cursor: {}, steps: {}{}>'.format(
+            self._cursor, self.steps, matrix)
+
+    def go_high(self):
+        if not self._prices:
+            for j, row in enumerate(self._cells):
+                for i, price in enumerate(row):
+                    self._prices[price].append((j, i))
+
+        prices = self._prices[max(self._prices)]
+        row, col = prices[0]
+        high = self._dist(col), col
+        for row, col in prices:
+            high = min(high, (self._dist, col))
+
+        dist, self._cursor = high
+        self.steps += dist
+
+    def purchase(self, row_col):
+        row, col = map(int, row_col.split(','))
+        price = self._cells[row][col]
+        if price == 0:
+            return False
+
+        self._prices[price].remove((row, col))
+        if not self._prices[price]:
+            del self._prices[price]
+
+        self._cells[row][col] = 0
+        self.steps += self._dist(col)
+        self._cursor = col
+        return True
+
+    def _dist(self, col):
+        d = abs(self._cursor - col)
+        return min(d, self._width - d)
+
 
 class VendingMachine:
+
     def motorUse(self, prices, purchases):
-        return 0
+        state = State(prices)
+#        print(purchases)
+#        print(state)
+
+        last = 0
+        for p in purchases:
+            coord, time = p.split(':')
+            time = int(time)
+            diff = time - last
+            last = time
+            if diff > 4:
+#                print('Hight', diff)
+                state.go_high()
+#                print(state)
+
+            if not state.purchase(coord):
+                return -1
+
+#            print(state)
+
+        if len(state._cells) < 2:
+            state.go_high()
+#        print(state)
+
+        return state.steps
+
 
 # CUT begin
 # TEST CODE FOR PYTHON {{{
